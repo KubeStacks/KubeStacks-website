@@ -1,0 +1,98 @@
+---
+import Tile from './features/Tile.astro'
+import ProblemsDemo from './features/ProblemsDemo.astro'
+import UsageDemo from './features/UsageDemo.astro'
+import ScaleDemo from './features/ScaleDemo.astro'
+import CommandDemo from './features/CommandDemo.astro'
+import LogsDemo from './features/LogsDemo.astro'
+import HelmDemo from './features/HelmDemo.astro'
+---
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Features</span>
+      <h2 class="h2">
+        Made for the day something breaks. <span class="dim">Calm on all the others.</span>
+      </h2>
+    </div>
+
+    <div class="grid">
+      <Tile span={7}>
+        <Fragment slot="title">Problems sort to the top</Fragment>
+        <Fragment slot="text">
+          Every object gets a clear status, and whatever is failing comes first. You won’t scroll
+          past 400 healthy pods to find the one that isn’t.
+        </Fragment>
+        <ProblemsDemo />
+      </Tile>
+
+      <Tile span={5}>
+        <Fragment slot="title">Usage next to capacity</Fragment>
+        <Fragment slot="text">
+          Live CPU and memory from metrics-server, set against requests, limits and what each node
+          can actually give.
+        </Fragment>
+        <UsageDemo />
+      </Tile>
+
+      <Tile span={5}>
+        <Fragment slot="title">Every change shows its kubectl</Fragment>
+        <Fragment slot="text">
+          Scale, restart, roll back or drain with guard rails. KubeStacks checks your permissions
+          first, shows the command it will run, and lets you undo.
+        </Fragment>
+        <ScaleDemo />
+      </Tile>
+
+      <Tile span={7}>
+        <Fragment slot="title">
+          <kbd class="kbd">⌘</kbd>
+          <kbd class="kbd">K</kbd> goes anywhere
+        </Fragment>
+        <Fragment slot="text">
+          Jump to any view, object, namespace or cluster. Every view has a shortcut, and lists work
+          with the arrow keys. Try it.
+        </Fragment>
+        <CommandDemo />
+      </Tile>
+
+      <Tile span={7}>
+        <Fragment slot="title">Logs from every pod, in order</Fragment>
+        <Fragment slot="text">
+          A workload’s pods merged in the order they wrote, each line marked with its pod. Pods that
+          start later join in. Keep only errors, or leave a pod out.
+        </Fragment>
+        <LogsDemo />
+      </Tile>
+
+      <Tile span={5}>
+        <Fragment slot="title">Helm releases, read in place</Fragment>
+        <Fragment slot="text">
+          Status, values, what a release made and every revision, with a diff between any two. No
+          helm needed to look; your own helm when you change something.
+        </Fragment>
+        <HelmDemo />
+      </Tile>
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding-block: clamp(64px, 9vw, 120px);
+  }
+
+  .head {
+    display: grid;
+    gap: 1.1rem;
+    max-width: 52rem;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+  }
+</style>

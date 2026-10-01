@@ -1,0 +1,370 @@
+---
+import { Image } from 'astro:assets'
+import peter from '../assets/peter.jpg'
+import { icon, pill } from '../lib/icons'
+import { site } from '../lib/site'
+
+const manifests = [
+  'deployment.yaml',
+  'service.yaml',
+  'ingress.yaml',
+  'hpa.yaml',
+  'pdb.yaml',
+  'certificate.yaml',
+  'networkpolicy.yaml',
+]
+---
+
+<section class="story" id="story">
+  <div class="wrap">
+    <div class="letter">
+      <aside class="who">
+        <Image
+          src={peter}
+          alt="Peter Kota"
+          width={112}
+          height={112}
+          densities={[1, 2, 4]}
+          class="photo"
+        />
+        <div>
+          <div class="name">Peter Kota</div>
+          <div class="role">
+            Creator of KubeStacks.
+            <br />
+            Works on Sevalla.
+          </div>
+        </div>
+        <a class="gh" href={site.author.url} target="_blank" rel="noopener">
+          @kotapeter
+        </a>
+      </aside>
+
+      <div class="body">
+        <span class="eyebrow">Why I built it</span>
+        <p class="pull">
+          I wanted to open a cluster and know in a second whether it was healthy, and if it wasn’t,
+          where to look first.
+        </p>
+        <div class="text">
+          <p>
+            I work on{' '}
+            <a href={site.sevalla} target="_blank" rel="noopener">
+              Sevalla
+            </a>
+            . It runs apps, databases and static sites on Kubernetes, and the whole point is that
+            our users never have to think about Kubernetes. They push code, and we look after the
+            clusters.
+          </p>
+          <p>
+            That means we watch a lot of clusters. Every day I’d jump between them to check on
+            nodes, pods and capacity. The tools I had were a terminal or a wall of tables. They
+            could tell me anything, just not at a glance.
+          </p>
+          <p>
+            I like to see things. A failing pod should look like a failing pod, and a node that’s
+            out of memory should stand out before anyone has to ask. So I built the app I wanted to
+            open every morning.
+          </p>
+          <p>
+            KubeStacks started as a tool for my own work. It’s free and open source, because anyone
+            who runs a cluster should have one like it.
+          </p>
+        </div>
+        <p class="sign">Peter</p>
+      </div>
+    </div>
+
+    <aside class="sevalla" aria-labelledby="sevalla-title">
+      <div class="s-copy">
+        <span class="eyebrow">Rather not run Kubernetes?</span>
+        <h2 id="sevalla-title">Sevalla keeps the clusters out of your way.</h2>
+        <p>
+          Push your code and Sevalla builds it, runs it and scales it on Kubernetes, with databases,
+          object storage and static sites next to it. You pay for the resources you use, and you
+          never write a manifest.
+        </p>
+        <a class="btn btn-secondary" href={site.sevalla} target="_blank" rel="noopener">
+          Try Sevalla
+          <Fragment set:html={icon('arrow-up-right')} />
+        </a>
+      </div>
+
+      <div class="s-art" aria-hidden="true">
+        <ul class="files">
+          {manifests.map((m) => (
+            <li>{m}</li>
+          ))}
+        </ul>
+        <div class="brace"></div>
+        <div class="push">
+          <code>
+            <span class="prompt">$</span> git push
+          </code>
+          <Fragment set:html={pill('healthy', 'Deployed')} />
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .story {
+    padding-block: clamp(72px, 10vw, 140px) clamp(48px, 7vw, 96px);
+    position: relative;
+  }
+
+  .story::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+  }
+
+  .letter {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .who {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    display: grid;
+    justify-items: start;
+    gap: 16px;
+  }
+
+  .who :global(.photo) {
+    width: 112px;
+    height: 112px;
+    border-radius: 28px;
+    object-fit: cover;
+    box-shadow:
+      0 0 0 1px var(--window-edge),
+      var(--shadow-panel);
+    filter: saturate(0.9);
+  }
+
+  .name {
+    font-weight: 600;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .role {
+    margin-top: 2px;
+    color: var(--text-3);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .gh {
+    font: 500 0.8125rem/1 var(--font-mono);
+    color: var(--accent-strong);
+    text-decoration: none;
+  }
+
+  .gh:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .body {
+    display: grid;
+    gap: 1.75rem;
+    max-width: 44rem;
+  }
+
+  .pull {
+    font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.5rem);
+    font-weight: 560;
+    line-height: 1.18;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 32;
+    text-wrap: balance;
+  }
+
+  .text {
+    display: grid;
+    gap: 1.1em;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-2);
+  }
+
+  .text a {
+    color: var(--text-1);
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+
+  .text a:hover {
+    text-decoration-color: var(--text-1);
+  }
+
+  .sign {
+    font-size: 1.125rem;
+    color: var(--text-1);
+    font-weight: 500;
+  }
+
+  .sign::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    margin-right: 12px;
+    vertical-align: middle;
+    background: var(--text-3);
+  }
+
+  /* Sevalla, as the other half of the same idea. */
+  .sevalla {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    align-items: center;
+    gap: clamp(32px, 5vw, 64px);
+    margin-top: clamp(72px, 9vw, 120px);
+    padding: clamp(28px, 4vw, 48px);
+    border-radius: 20px;
+    background:
+      radial-gradient(80% 120% at 100% 50%, rgb(57 135 229 / 0.08), transparent 60%), var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .s-copy {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+  }
+
+  .s-copy h2 {
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+
+  .s-copy p {
+    color: var(--text-2);
+    max-width: 32rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .s-art {
+    display: grid;
+    grid-template-columns: auto 28px auto;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .files {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 12.5px/1 var(--font-mono);
+    color: var(--text-3);
+  }
+
+  .files li {
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .brace {
+    align-self: stretch;
+    margin-block: 14px;
+    border: 1px solid var(--line-strong);
+    border-left: 0;
+    border-radius: 0 10px 10px 0;
+    position: relative;
+  }
+
+  .brace::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: 18px;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .push {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--code-bg);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      0 20px 40px -24px rgb(57 135 229 / 0.5);
+  }
+
+  .push code {
+    font-size: 14px;
+    color: var(--text-1);
+  }
+
+  .prompt {
+    color: var(--text-3);
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .files li {
+        animation: fold linear both;
+        animation-timeline: view();
+        animation-range: cover 30% cover 55%;
+      }
+    }
+  }
+
+  /* The manifests get crossed out as the card scrolls in: git push replaces them. */
+  @keyframes fold {
+    to {
+      opacity: 0.5;
+      text-decoration: line-through;
+      text-decoration-color: var(--text-3);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .letter,
+    .sevalla {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .who {
+      position: static;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+    .who :global(.photo) {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+    }
+    .gh {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .s-art {
+      grid-template-columns: auto 20px auto;
+      gap: 10px;
+    }
+    .files {
+      font-size: 11px;
+    }
+  }
+</style>

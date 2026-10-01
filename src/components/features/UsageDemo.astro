@@ -1,0 +1,219 @@
+---
+/** The overview's CPU card; scripts/features/usage.ts keeps its numbers live. */
+import { icon } from '../../lib/icons'
+---
+
+<div class="demo" data-usage>
+  <div class="top">
+    <span class="title">CPU</span>
+    <span class="history">
+      History <Fragment set:html={icon('arrow-right')} />
+    </span>
+  </div>
+  <div class="main">
+    <div>
+      <div class="big">
+        <span data-u-pct>44</span>%
+      </div>
+      <div class="sub">
+        <span data-u-cores>12.2</span> cores of 27.5 cores in use
+      </div>
+    </div>
+    <div class="spark">
+      <svg viewBox="0 0 160 44" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" style="stop-color: var(--accent); stop-opacity: 0.3"></stop>
+            <stop offset="1" style="stop-color: var(--accent); stop-opacity: 0"></stop>
+          </linearGradient>
+        </defs>
+        <path data-u-area fill="url(#spark-fill)" d=""></path>
+        <path
+          data-u-line
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          vector-effect="non-scaling-stroke"
+          d=""
+        ></path>
+      </svg>
+      <span class="end" data-u-end></span>
+      <small>Last hour</small>
+    </div>
+  </div>
+  <div
+    class="meter"
+    role="meter"
+    aria-label="CPU in use"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="44"
+  >
+    <i data-u-fill style="width: 44%"></i>
+    <b title="Requests: 25%" style="left: 25%"></b>
+  </div>
+  <dl>
+    <div>
+      <dt>Requests</dt>
+      <dd>
+        6.8 cores <span>· 25%</span>
+      </dd>
+    </div>
+    <div>
+      <dt>Limits</dt>
+      <dd>
+        23 cores <span>· 84%</span>
+      </dd>
+    </div>
+    <div>
+      <dt>Allocatable</dt>
+      <dd>27.5 cores</dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  .demo {
+    --demo-h: 340px;
+    padding: 18px 20px 20px;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .title {
+    font-weight: 600;
+  }
+
+  .history {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--accent-strong);
+    font-size: 12.5px;
+  }
+
+  .history :global(svg) {
+    width: 13px;
+    height: 13px;
+  }
+
+  .main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin: 14px 0 16px;
+  }
+
+  .big {
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    font-variation-settings: 'opsz' 32;
+  }
+
+  .sub {
+    margin-top: 8px;
+    color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spark {
+    position: relative;
+    width: min(46%, 170px);
+    flex-shrink: 0;
+    display: grid;
+    justify-items: end;
+    gap: 4px;
+  }
+
+  .spark svg {
+    width: 100%;
+    height: 44px;
+    overflow: visible;
+    color: var(--accent);
+  }
+
+  .spark small {
+    font-size: 11.5px;
+    color: var(--text-3);
+  }
+
+  .end {
+    position: absolute;
+    left: 100%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--surface-2);
+    transform: translate(-50%, -50%);
+    transition: top 600ms var(--ease-out);
+  }
+
+  .meter {
+    position: relative;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--accent-track);
+  }
+
+  .meter i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent);
+    transition: width 600ms var(--ease-out);
+  }
+
+  .meter b {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 2px;
+    background: var(--marker);
+    box-shadow: 0 0 0 2px var(--surface-2);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 18px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  dt {
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  dd span {
+    color: var(--text-3);
+  }
+
+  @media (max-width: 560px) {
+    dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/features/usage'
+</script>

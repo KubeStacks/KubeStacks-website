@@ -1,0 +1,493 @@
+@import '@fontsource-variable/inter/opsz.css';
+@import '@fontsource-variable/jetbrains-mono/index.css';
+
+/*
+ * Layout: a quiet page in the app's own palette. Each section is a left-aligned column of
+ * copy beside (or above) a real piece of the app, on a 12-column grid. The only loud thing
+ * is the cluster in the hero; everything after it stays calm.
+ *
+ * Colors are the app's tokens (kubestacks/src/renderer/src/styles), dark first, plus the
+ * navy of the app icon for the glows. The light theme redefines the same tokens. A script
+ * in <head> sets data-theme before the first paint (System, Light or Dark, as in the app);
+ * without JavaScript the page stays dark.
+ */
+:root {
+  color-scheme: dark;
+
+  --bg: #0c0c0e;
+  --surface: #121215;
+  --surface-2: #18181c;
+  --surface-3: #212126;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.12);
+  --text-1: #f2f2f4;
+  --text-2: #a1a1aa;
+  --text-3: #8b8b94;
+  --accent: #3987e5;
+  --accent-strong: #5ea2f0;
+  --accent-hover: #4793ec;
+  --accent-soft: rgb(57 135 229 / 0.16);
+  --accent-track: rgb(57 135 229 / 0.2);
+
+  --good: #0ca30c;
+  --warn: #fab219;
+  --critical: #d03b3b;
+  --neutral: #898781;
+  --good-text: #3fb950;
+  --warn-text: #e3a008;
+  --serious-text: #f0883e;
+  --critical-text: #f85149;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+
+  /* Fills and surfaces the app doesn't name. */
+  --tint: rgb(255 255 255 / 0.04);
+  --tint-strong: rgb(255 255 255 / 0.07);
+  --nav-bg: rgb(12 12 14 / 0.72);
+  --glass: rgb(24 24 28 / 0.72);
+  --popover: rgb(24 24 28 / 0.92);
+  --code-bg: #0f0f12;
+  --tile-bg: linear-gradient(to bottom, #131317, #0f0f12);
+  --tile-tint: rgb(57 135 229 / 0.06);
+  --window-edge: rgb(255 255 255 / 0.08);
+  --marker: rgb(242 242 244 / 0.7);
+  --dim-from: #8b8b94;
+  --dim-to: #5e6170;
+  --syntax-key: #79c0ff;
+  --syntax-string: #a5d6ff;
+  --diff-add: #7ee08a;
+  --diff-add-bg: rgb(63 185 80 / 0.12);
+  --diff-del: #ff8f88;
+  --diff-del-bg: rgb(248 81 73 / 0.12);
+  --hero-glow:
+    radial-gradient(60% 55% at 72% 42%, rgb(57 135 229 / 0.2), transparent 70%),
+    radial-gradient(40% 40% at 20% 10%, rgb(29 43 79 / 0.55), transparent 70%),
+    linear-gradient(to bottom, rgb(10 15 31 / 0.6), transparent 60%);
+  --download-glow:
+    radial-gradient(40% 32% at 50% 22%, rgb(57 135 229 / 0.16), transparent 70%),
+    radial-gradient(60% 45% at 50% 22%, rgb(29 43 79 / 0.5), transparent 70%);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 0 1px rgb(255 255 255 / 0.02), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 16px 48px -8px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.08);
+  --shadow-demo: 0 -12px 40px -20px rgb(0 0 0 / 0.8);
+  --shadow-window:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 40px 120px -30px rgb(0 0 0 / 0.9),
+    0 30px 80px -40px rgb(57 135 229 / 0.35);
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type scale */
+  --step-display: clamp(2.75rem, 1.5rem + 3.7vw, 5.25rem);
+  --step-h2: clamp(2.125rem, 1.6rem + 2.4vw, 3.5rem);
+  --step-h3: 1.125rem;
+  --step-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --step-body: 1rem;
+  --step-small: 0.875rem;
+  --step-label: 0.75rem;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1240px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The app's light tokens. */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f5f5f6;
+  --surface: #ffffff;
+  --surface-2: #fafafb;
+  --surface-3: #f0f0f2;
+  --line: rgb(12 12 20 / 0.08);
+  --line-strong: rgb(12 12 20 / 0.14);
+  --text-1: #0b0b0f;
+  --text-2: #52525b;
+  --text-3: #71717a;
+  --accent: #2a78d6;
+  --accent-strong: #1c5cab;
+  --accent-hover: #1f6cc8;
+  --accent-soft: rgb(42 120 214 / 0.1);
+  --accent-track: #dbe8f8;
+
+  --good-text: #1a7f37;
+  --warn-text: #8a5a00;
+  --serious-text: #b4501f;
+  --critical-text: #b42318;
+
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+
+  --tint: rgb(12 12 20 / 0.03);
+  --tint-strong: rgb(12 12 20 / 0.06);
+  --nav-bg: rgb(245 245 246 / 0.78);
+  --glass: rgb(255 255 255 / 0.78);
+  --popover: rgb(255 255 255 / 0.96);
+  --code-bg: #fbfbfc;
+  --tile-bg: linear-gradient(to bottom, #ffffff, #fbfbfc);
+  --tile-tint: rgb(42 120 214 / 0.05);
+  --window-edge: rgb(12 12 20 / 0.08);
+  --marker: rgb(11 11 15 / 0.6);
+  --dim-from: #8b8b94;
+  --dim-to: #b3b5be;
+  --syntax-key: #0550ae;
+  --syntax-string: #0a3069;
+  --diff-add: #116329;
+  --diff-add-bg: rgb(26 127 55 / 0.1);
+  --diff-del: #a40e26;
+  --diff-del-bg: rgb(207 34 46 / 0.08);
+  --hero-glow:
+    radial-gradient(60% 55% at 72% 42%, rgb(42 120 214 / 0.13), transparent 70%),
+    radial-gradient(40% 40% at 20% 10%, rgb(42 120 214 / 0.07), transparent 70%),
+    linear-gradient(to bottom, rgb(219 232 248 / 0.55), transparent 60%);
+  --download-glow:
+    radial-gradient(40% 32% at 50% 22%, rgb(42 120 214 / 0.12), transparent 70%),
+    radial-gradient(60% 45% at 50% 22%, rgb(219 232 248 / 0.7), transparent 70%);
+
+  --shadow-xs: 0 1px 2px rgb(12 12 20 / 0.08);
+  --shadow-panel: 0 1px 2px rgb(12 12 20 / 0.04), 0 8px 24px -12px rgb(12 12 20 / 0.12);
+  --shadow-pop: 0 12px 40px -8px rgb(12 12 20 / 0.25), 0 0 0 1px rgb(12 12 20 / 0.06);
+  --shadow-demo: 0 -12px 40px -24px rgb(12 12 20 / 0.18);
+  --shadow-window:
+    0 0 0 1px rgb(12 12 20 / 0.06), 0 40px 100px -40px rgb(12 12 20 / 0.35),
+    0 30px 80px -40px rgb(42 120 214 / 0.25);
+}
+
+/* Switching themes: the new one opens as a circle from the switch (see scripts/theme.ts). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: var(--step-body);
+  line-height: 1.6;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgb(57 135 229 / 0.35);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  font-variation-settings: 'opsz' 32;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* Shared building blocks. Components keep their own styles; these are what repeats. */
+
+.wrap {
+  width: 100%;
+  max-width: calc(var(--max) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--step-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.h2 {
+  font-size: var(--step-h2);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+.h2 .dim {
+  color: var(--text-3);
+}
+
+.lead {
+  font-size: var(--step-lead);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 34em;
+}
+
+.btn {
+  --h: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  height: var(--h);
+  padding-inline: 1.1rem;
+  border-radius: 11px;
+  font: 500 0.9375rem/1 var(--font-sans);
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 0;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    var(--shadow-xs),
+    0 8px 24px -8px rgb(57 135 229 / 0.6);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-1);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-3);
+}
+
+.btn .tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.18);
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 5px;
+  border-radius: 5px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  font: 500 11px/1 var(--font-sans);
+  color: var(--text-3);
+}
+
+/* The app's status pill: an icon and a label, so status never relies on color alone. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  max-width: 100%;
+  padding: 0 8px 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke-width: 2.25;
+}
+
+.pill[data-health='healthy'] {
+  background: rgb(12 163 12 / 0.1);
+  color: var(--good-text);
+}
+.pill[data-health='progressing'] {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.pill[data-health='warning'] {
+  background: rgb(250 178 25 / 0.12);
+  color: var(--warn-text);
+}
+.pill[data-health='critical'] {
+  background: rgb(208 59 59 / 0.12);
+  color: var(--critical-text);
+}
+.pill[data-health='neutral'] {
+  background: var(--surface-3);
+  color: var(--text-2);
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot[data-health='healthy'] {
+  background: var(--good);
+}
+.dot[data-health='progressing'] {
+  background: var(--accent);
+}
+.dot[data-health='warning'] {
+  background: var(--warn);
+}
+.dot[data-health='critical'] {
+  background: var(--critical);
+}
+.dot[data-health='neutral'] {
+  background: var(--neutral);
+}
+
+.pulse {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* The app's `rise`: a short lift into place. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/*
+ * A working piece of the app in a feature tile. Each has a set height (it may still grow to
+ * match the other tile in its row), so its live content (typing, new log lines, re-sorting)
+ * never changes the page's layout.
+ */
+.demo {
+  flex: 1 0 auto;
+  height: var(--demo-h, 330px);
+  min-width: 0;
+  /* Lines and rows move here all the time; the browser mustn't scroll the page to follow. */
+  overflow-anchor: none;
+  margin-inline: -1px;
+  border-radius: 12px 12px 0 0;
+  background: var(--surface-2);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    var(--shadow-demo);
+  font-size: 13px;
+  line-height: 1.35;
+  position: relative;
+  overflow: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

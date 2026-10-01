@@ -1,0 +1,131 @@
+---
+import KubeStacksLogo from './logos/KubeStacksLogo.astro'
+import SevallaLogo from './logos/SevallaLogo.astro'
+import { site } from '../lib/site'
+
+const links = [
+  { label: 'GitHub', href: site.repo },
+  { label: 'Releases', href: site.releases },
+  { label: 'Changelog', href: `${site.repo}/blob/main/CHANGELOG.md` },
+  { label: 'Contributing', href: `${site.repo}/blob/main/CONTRIBUTING.md` },
+  { label: 'Security', href: `${site.repo}/blob/main/SECURITY.md` },
+  { label: 'Sevalla', href: site.sevalla },
+]
+---
+
+<footer class="footer">
+  <div class="wrap inner">
+    <div class="brand">
+      <KubeStacksLogo size={22} />
+      <span>KubeStacks</span>
+    </div>
+    <nav aria-label="Project links">
+      {links.map((l) => (
+        <a href={l.href} target="_blank" rel="noopener">
+          {l.label}
+        </a>
+      ))}
+    </nav>
+    <p class="fine">
+      Made by{' '}
+      <a href={site.author.url} target="_blank" rel="noopener">
+        {site.author.name}
+      </a>
+      . Free and open source under the Apache 2.0 license. Kubernetes is a registered trademark of
+      the Linux Foundation.
+    </p>
+    <a class="hosted" href={`${site.sevalla}&utm_content=hosted`} target="_blank" rel="noopener">
+      <span>Hosted on</span>
+      <SevallaLogo height={22} />
+    </a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 40px calc(40px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+  }
+
+  .inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 20px 32px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 20px;
+  }
+
+  nav a {
+    font-size: 0.875rem;
+    color: var(--text-2);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--text-1);
+  }
+
+  .fine {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    max-width: 44rem;
+  }
+
+  .hosted {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 12px 5px 14px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .hosted:hover {
+    background: var(--tint-strong);
+    color: var(--text-1);
+  }
+
+  .hosted :global(svg) {
+    display: block;
+    color: var(--text-1);
+  }
+
+  .fine a {
+    color: var(--text-2);
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 640px) {
+    .inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    nav {
+      justify-content: flex-start;
+    }
+    .hosted {
+      justify-self: start;
+    }
+  }
+</style>

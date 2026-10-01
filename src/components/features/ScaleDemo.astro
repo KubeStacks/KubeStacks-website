@@ -1,0 +1,241 @@
+---
+/** The app's Scale dialog; scripts/features/scale.ts makes it work. */
+import { icon } from '../../lib/icons'
+---
+
+<div class="demo" data-scale>
+  <div>
+    <div class="title">Scale checkout</div>
+    <div class="sub">
+      Deployment in <b>shop</b> on <b>demo</b>
+    </div>
+  </div>
+  <div class="field">
+    <span class="label">Replicas</span>
+    <div class="stepper">
+      <button type="button" data-step="-1" aria-label="Fewer replicas" set:html={icon('minus')} />
+      <output aria-live="polite">3</output>
+      <button type="button" data-step="1" aria-label="More replicas" set:html={icon('plus')} />
+    </div>
+    <span class="now" data-now>
+      Now 3
+    </span>
+  </div>
+  <div class="command">
+    <code data-cmd>kubectl scale deployment/checkout --replicas=3 -n shop --context demo</code>
+  </div>
+  <div class="actions">
+    <button type="button" class="b b-ghost" data-cancel>
+      Cancel
+    </button>
+    <button type="button" class="b b-primary" data-apply disabled>
+      Scale
+    </button>
+  </div>
+  <div class="toast" data-toast hidden role="status">
+    <span class="toast-icon" set:html={icon('circle-check', 2.25)} />
+    <span class="toast-text" data-toast-text></span>
+    <button type="button" class="undo" data-undo>
+      <Fragment set:html={icon('undo-2')} />
+      Undo
+    </button>
+  </div>
+</div>
+
+<style>
+  .demo {
+    padding: 20px;
+    display: grid;
+    align-content: start;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .sub {
+    margin-top: 3px;
+    color: var(--text-3);
+  }
+
+  .sub b {
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .label {
+    color: var(--text-2);
+    min-width: 64px;
+  }
+
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  .stepper button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    border-radius: 9px;
+    cursor: pointer;
+  }
+
+  .stepper button:hover {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .stepper button :global(svg) {
+    width: 15px;
+    height: 15px;
+  }
+
+  output {
+    min-width: 34px;
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .now {
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+
+  .command {
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .command code {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-2);
+    overflow-wrap: anywhere;
+  }
+
+  .command :global(.arg) {
+    color: var(--accent-strong);
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .b {
+    height: 32px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    font: 500 13px/1 var(--font-sans);
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      opacity 150ms ease;
+  }
+
+  .b-ghost {
+    background: var(--surface-3);
+    color: var(--text-1);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  .b-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .b-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .b:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .toast {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 10px 12px;
+    border-radius: 10px;
+    background: var(--surface-3);
+    box-shadow: var(--shadow-pop);
+    animation: toast-in 280ms var(--ease-out);
+  }
+
+  @keyframes toast-in {
+    from {
+      transform: translateY(12px) scale(0.98);
+      opacity: 0;
+    }
+  }
+
+  .toast-icon {
+    display: grid;
+    color: var(--good-text);
+  }
+
+  .toast-icon :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .toast-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .undo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--accent-strong);
+    font: 500 12.5px/1 var(--font-sans);
+    cursor: pointer;
+  }
+
+  .undo:hover {
+    background: var(--tint-strong);
+  }
+
+  .undo :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+</style>
+
+<script>
+  import '../../scripts/features/scale'
+</script>

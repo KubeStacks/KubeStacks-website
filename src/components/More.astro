@@ -1,0 +1,319 @@
+---
+import { icon, type IconName } from '../lib/icons'
+import { highlightYaml } from '../lib/yaml'
+
+const projects = [
+  'cert-manager',
+  'Argo CD',
+  'Argo Rollouts',
+  'Flux',
+  'Gateway API',
+  'Karpenter',
+  'KEDA',
+  'External Secrets',
+  'Prometheus Operator',
+  'CloudNativePG',
+  'Istio',
+  'Velero',
+  'Crossplane',
+]
+
+// A trimmed copy of the app's own cert-manager view (src/renderer/src/views in the app).
+const yaml = `apiVersion: kubestacks.dev/v1alpha1
+kind: View
+metadata:
+  name: cert-manager-certificates
+spec:
+  kinds:
+    - { group: cert-manager.io, kind: Certificate }
+  columns:
+    - { name: Hosts, path: '.spec.dnsNames[*]' }
+    - { name: Expires, path: .status.notAfter, type: date }
+  status:
+    - when: { path: '.status.conditions[?(@.type=="Ready")].status', equals: 'True' }
+      health: healthy
+      label: Ready
+  links:
+    - { name: Secret, kind: Secret, objectName: '{{ .spec.secretName }}' }`
+
+const more: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: 'square-terminal',
+    title: 'Shells and debug containers',
+    text: 'Open a shell in any container, or add a debug container with tools to a pod that has none, distroless included.',
+  },
+  {
+    icon: 'plug',
+    title: 'Port forwards',
+    text: 'Forward to pods and services on localhost. They stay in the header until you stop them or quit.',
+  },
+  {
+    icon: 'list-checks',
+    title: 'Many at once',
+    text: 'Select rows with Shift-click or X, then restart, cordon, suspend or delete them together, with a retry for any that fail.',
+  },
+  {
+    icon: 'shield-check',
+    title: 'Hard to do by accident',
+    text: 'Destructive dialogs start on Cancel. Anything in a cluster named like production asks you to type the name first.',
+  },
+  {
+    icon: 'lock',
+    title: 'Read-only when you want it',
+    text: 'Turn changes off for one cluster, or for all of them with KUBESTACKS_READ_ONLY=1. The app enforces it, not just the buttons.',
+  },
+  {
+    icon: 'key-round',
+    title: 'Works with your kubeconfig',
+    text: 'Multiple files, client certificates, tokens and exec plugins like gke-gcloud-auth-plugin, aws eks get-token and kubelogin.',
+  },
+  {
+    icon: 'gauge',
+    title: 'Built for big clusters',
+    text: 'Lists load in chunks of 500 and are paginated and virtualized, so thousands of pods stay smooth.',
+  },
+  {
+    icon: 'wifi-off',
+    title: 'Calm when things go wrong',
+    text: 'A lost connection shows a banner and keeps the last data on screen instead of a blank window.',
+  },
+  {
+    icon: 'check',
+    title: 'Tested end to end',
+    text: '100% coverage of every line and branch, measured across all three Electron processes on macOS, Windows and Linux.',
+  },
+]
+---
+
+<section class="more">
+  <div class="wrap">
+    <div class="views">
+      <div class="views-copy">
+        <span class="eyebrow">Custom resources</span>
+        <h2 class="h2">
+          Every other kind, <span class="dim">too.</span>
+        </h2>
+        <p class="lead">
+          KubeStacks finds custom resources through discovery and shows them with the columns{' '}
+          <code>kubectl get</code> prints and a status read from their conditions. Views add the
+          columns, links and actions that matter for popular projects.
+        </p>
+        <ul class="projects" aria-label="Projects with views included">
+          {projects.map((p) => (
+            <li>{p}</li>
+          ))}
+          <li class="yours">Your own</li>
+        </ul>
+      </div>
+
+      <figure class="yaml" aria-label="A view, written in YAML">
+        <figcaption>
+          <span>~/.kubestacks/views/certificates.yaml</span>
+        </figcaption>
+        <pre><code set:html={highlightYaml(yaml)} /></pre>
+        <p class="yaml-note">
+          Views are data only. They read fields with JSONPath and change objects only with the
+          patches they spell out.
+        </p>
+      </figure>
+    </div>
+
+    <ul class="list">
+      {more.map((m) => (
+        <li>
+          <span class="ic" set:html={icon(m.icon)} />
+          <h3>{m.title}</h3>
+          <p>{m.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .more {
+    padding-block: clamp(48px, 7vw, 96px) clamp(64px, 9vw, 120px);
+  }
+
+  .views {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  .views-copy {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .lead code {
+    font-size: 0.875em;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .projects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .projects li {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+  }
+
+  .projects .yours {
+    background: transparent;
+    box-shadow: none;
+    outline: 1px dashed var(--line-strong);
+    outline-offset: -1px;
+    color: var(--accent-strong);
+  }
+
+  .yaml {
+    margin: 0;
+    min-width: 0;
+    border-radius: 14px;
+    background: var(--code-bg);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--shadow-panel);
+    overflow: hidden;
+  }
+
+  .yaml figcaption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--line);
+    font: 500 12px/1 var(--font-mono);
+    color: var(--text-3);
+  }
+
+  .yaml figcaption::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 3px rgb(12 163 12 / 0.15);
+  }
+
+  .yaml pre {
+    margin: 0;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text-1);
+  }
+
+  .yaml :global(.k) {
+    color: var(--syntax-key);
+  }
+  .yaml :global(.q) {
+    color: var(--syntax-string);
+  }
+
+  .yaml-note {
+    padding: 12px 18px 14px;
+    border-top: 1px solid var(--line);
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: clamp(64px, 8vw, 104px) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .list li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 6px 14px;
+    padding: 28px 28px 28px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .list li:not(:nth-child(3n + 1)) {
+    padding-left: 28px;
+    border-left: 1px solid var(--line);
+  }
+
+  .ic {
+    grid-row: span 2;
+    color: var(--accent-strong);
+    padding-top: 2px;
+  }
+
+  .ic :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+
+  .list h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .list p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  @media (max-width: 960px) {
+    .views {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .list li:not(:nth-child(3n + 1)) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .list li:nth-child(2n) {
+      padding-left: 24px;
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .yaml pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 11.5px;
+    }
+    .list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .list li:nth-child(2n) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .list li {
+      padding-right: 0;
+    }
+  }
+</style>

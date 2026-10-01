@@ -1,0 +1,173 @@
+---
+/** A Helm release's history in the app; scripts/features/helm.ts shows the diffs. */
+import { pill } from '../../lib/icons'
+
+const earlier = [
+  { rev: '2', title: 'Upgrade complete', chart: '2.4.0', app: '3.9.0', age: '20d' },
+  { rev: '1', title: 'Install complete', chart: '2.3.0', app: '3.8.0', age: '60d' },
+]
+---
+
+<div class="demo" data-helm>
+  <ol>
+    <li class="revision">
+      <span class="num">3</span>
+      <span class="what">
+        <b>Upgrade complete</b>
+        <small>Chart&nbsp;2.4.1 · app&nbsp;3.9.1 · 2d&nbsp;ago</small>
+      </span>
+      <span set:html={pill('healthy', 'Deployed')} />
+    </li>
+    {earlier.map((r) => (
+      <li>
+        <button type="button" class="revision" data-rev={r.rev} aria-pressed="false">
+          <span class="num">{r.rev}</span>
+          <span class="what">
+            <b>{r.title}</b>
+            <small set:html={`Chart&nbsp;${r.chart} · app&nbsp;${r.app} · ${r.age}&nbsp;ago`} />
+          </span>
+          <span set:html={pill('neutral', 'Superseded')} />
+        </button>
+      </li>
+    ))}
+  </ol>
+  <div class="bar">
+    <span>
+      Values, <b data-from>2</b> → <b>3</b>
+    </span>
+    <span class="stat" data-stat></span>
+  </div>
+  <pre aria-label="Values diff"></pre>
+</div>
+
+<style>
+  .demo {
+    --demo-h: 360px;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .revision {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 16px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+  }
+
+  button {
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+
+  button:hover {
+    background: var(--tint);
+  }
+
+  button[aria-pressed='true'] {
+    background: var(--accent-soft);
+  }
+
+  .num {
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .what {
+    display: grid;
+    min-width: 0;
+  }
+
+  .what b {
+    font-weight: 500;
+  }
+
+  .what small {
+    font-size: 12px;
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+
+  .bar b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .stat :global(ins) {
+    color: var(--good-text);
+    text-decoration: none;
+  }
+
+  .stat :global(del) {
+    color: var(--critical-text);
+    text-decoration: none;
+  }
+
+  /* Six lines, the longest diff, so picking a revision never changes the panel's height. */
+  pre {
+    min-height: calc(6 * 1.75em + 16px);
+    margin: 0;
+    padding: 8px 0;
+    font-size: 12px;
+    line-height: 1.75;
+    color: var(--text-2);
+    background: var(--code-bg);
+    overflow-x: auto;
+  }
+
+  pre :global(span) {
+    display: block;
+    padding: 0 16px;
+    white-space: pre;
+  }
+
+  pre :global(.add) {
+    background: var(--diff-add-bg);
+    color: var(--diff-add);
+  }
+
+  pre :global(.del) {
+    background: var(--diff-del-bg);
+    color: var(--diff-del);
+  }
+
+  @media (max-width: 560px) {
+    /* The details wrap here, and the content sets the height; the diff keeps its room. */
+    .demo {
+      --demo-h: auto;
+    }
+    .what small {
+      white-space: normal;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/features/helm'
+</script>

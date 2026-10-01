@@ -1,0 +1,392 @@
+---
+import { Image } from 'astro:assets'
+import overview from '../assets/screenshots/overview-dark.png'
+import overviewLight from '../assets/screenshots/overview-light.png'
+import workloads from '../assets/screenshots/workloads-dark.png'
+import workloadsLight from '../assets/screenshots/workloads-light.png'
+import pods from '../assets/screenshots/bulk-dark.png'
+import podsLight from '../assets/screenshots/bulk-light.png'
+import metrics from '../assets/screenshots/metrics-dark.png'
+import metricsLight from '../assets/screenshots/metrics-light.png'
+import logs from '../assets/screenshots/logs-dark.png'
+import logsLight from '../assets/screenshots/logs-light.png'
+import shell from '../assets/screenshots/shell-dark.png'
+import shellLight from '../assets/screenshots/shell-light.png'
+import helm from '../assets/screenshots/helm-dark.png'
+import helmLight from '../assets/screenshots/helm-light.png'
+
+// The keys are the app's own: press G, then the letter (shared/navigation.ts in the app).
+const views = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    key: 'O',
+    img: overview,
+    imgLight: overviewLight,
+    alt: 'The overview: nodes ready, pods running, CPU and memory against capacity, pod health by namespace, and each node’s usage.',
+    caption: 'What needs attention, live usage against what’s allocatable, and every node’s load.',
+  },
+  {
+    id: 'workloads',
+    label: 'Workloads',
+    key: 'W',
+    img: workloads,
+    imgLight: workloadsLight,
+    alt: 'Every workload in one list, sorted with failing and degraded ones first.',
+    caption:
+      'Deployments, StatefulSets, DaemonSets, Jobs and CronJobs in one list. Failing ones first.',
+  },
+  {
+    id: 'pods',
+    label: 'Pods',
+    key: 'P',
+    img: pods,
+    imgLight: podsLight,
+    alt: 'The pods list with three pods selected and a bar to restart or delete them together.',
+    caption: 'Pick a few rows, or a hundred, and restart or delete them together.',
+  },
+  {
+    id: 'metrics',
+    label: 'Metrics',
+    key: 'U',
+    img: metrics,
+    imgLight: metricsLight,
+    alt: 'CPU by namespace over six hours, with a distribution and a ranked table.',
+    caption:
+      'History from your Prometheus or VictoriaMetrics, found for you. Drag across a chart to zoom.',
+  },
+  {
+    id: 'logs',
+    label: 'Logs',
+    key: null,
+    img: logs,
+    imgLight: logsLight,
+    alt: 'Logs from all three pods of the checkout deployment, merged in order with each line marked by its pod.',
+    caption: 'Every pod of a workload, merged in the order lines were written.',
+  },
+  {
+    id: 'shell',
+    label: 'Shell',
+    key: null,
+    img: shell,
+    imgLight: shellLight,
+    alt: 'A shell open in a storefront pod, in the detail panel.',
+    caption: 'A terminal in any container, or a debug container in pods that have no shell.',
+  },
+  {
+    id: 'helm',
+    label: 'Helm',
+    key: 'H',
+    img: helm,
+    imgLight: helmLight,
+    alt: 'Helm releases, with the storefront release’s history and a diff of its values between revisions.',
+    caption: 'Releases, their values and every revision, with a diff between any two.',
+  },
+]
+---
+
+<section class="showcase" id="app" data-showcase>
+  <div class="wrap">
+    <div class="head">
+      <div class="intro">
+        <span class="eyebrow">The app</span>
+        <h2 class="h2">
+          One calm window for <span class="dim">every cluster in your kubeconfig.</span>
+        </h2>
+      </div>
+      <p class="lead">
+        Pick a cluster and KubeStacks shows you how it’s doing. Problems sort to the top, usage sits
+        next to capacity, and the details are one click away.
+      </p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Views in the app">
+      {views.map((v, i) => (
+        <button
+          role="tab"
+          id={`tab-${v.id}`}
+          data-view={v.id}
+          aria-controls={`view-${v.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          data-key={v.key ?? undefined}
+        >
+          {v.label}
+          {v.key && (
+            <span class="keys" aria-hidden="true">
+              <kbd class="kbd">G</kbd>
+              <kbd class="kbd">{v.key}</kbd>
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+
+    <figure class="window">
+      <div class="screen">
+        {views.map((v, i) => (
+          <div
+            class="view"
+            role="tabpanel"
+            id={`view-${v.id}`}
+            data-view={v.id}
+            aria-labelledby={`tab-${v.id}`}
+            data-active={i === 0 ? 'true' : 'false'}
+          >
+            {(
+              [
+                ['dark', v.img],
+                ['light', v.imgLight],
+              ] as const
+            ).map(([variant, img]) => (
+              <Image
+                src={img}
+                alt={v.alt}
+                widths={[960, 1440, 2000, 2880]}
+                sizes="(max-width: 1320px) 100vw, 1240px"
+                loading="lazy"
+                draggable="false"
+                data-variant={variant}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </figure>
+
+    <div class="foot">
+      {views.map((v, i) => (
+        <p class="caption" data-caption={v.id} hidden={i !== 0}>
+          {v.caption}
+        </p>
+      ))}
+      <p class="tip">
+        Press <kbd class="kbd">G</kbd> then a letter to switch views, just like in the app.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .showcase {
+    padding-block: clamp(64px, 9vw, 128px) clamp(48px, 6vw, 80px);
+    position: relative;
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: 2rem 4rem;
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+
+  .intro {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .head .lead {
+    font-size: 1.0625rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 16px;
+    padding: 4px;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  [role='tab'] {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-2);
+    font: 500 0.875rem/1 var(--font-sans);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  [role='tab']:hover {
+    color: var(--text-1);
+  }
+
+  [role='tab'][aria-selected='true'] {
+    background: var(--surface-3);
+    color: var(--text-1);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      var(--shadow-xs);
+  }
+
+  .keys {
+    display: inline-flex;
+    gap: 3px;
+    opacity: 0.55;
+    transition: opacity 150ms ease;
+  }
+
+  [role='tab']:hover .keys,
+  [role='tab'][aria-selected='true'] .keys {
+    opacity: 1;
+  }
+
+  .keys .kbd {
+    height: 18px;
+    min-width: 18px;
+    font-size: 10px;
+  }
+
+  /*
+   * The window tips back and settles flat as it scrolls into view, where the browser can
+   * tie animations to scrolling. Elsewhere it simply sits flat.
+   */
+  .window {
+    margin: 0;
+    perspective: 2000px;
+  }
+
+  .screen {
+    position: relative;
+    aspect-ratio: 1440 / 900;
+    max-width: 100%;
+    border-radius: clamp(10px, 1.2vw, 16px);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shadow-window);
+    transform-origin: 50% 0%;
+  }
+
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--window-edge);
+    pointer-events: none;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .screen {
+        animation: settle linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 45%;
+      }
+    }
+  }
+
+  @keyframes settle {
+    from {
+      transform: rotateX(16deg) scale(0.92) translateY(24px);
+      opacity: 0.5;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  .view {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 280ms ease;
+  }
+
+  .view[data-active='true'] {
+    opacity: 1;
+  }
+
+  /* Each view has a screenshot per theme; only the current theme's shows, or loads. */
+  :global(:root[data-theme='light']) .view :global(img[data-variant='dark']),
+  :global(:root:not([data-theme='light'])) .view :global(img[data-variant='light']) {
+    display: none;
+  }
+
+  .view :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+  }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin-top: 20px;
+    font-size: 0.9375rem;
+  }
+
+  .caption {
+    color: var(--text-2);
+    animation: rise 400ms var(--ease-out) both;
+  }
+
+  .tip {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .tip .kbd {
+    margin-inline: 2px;
+  }
+
+  @media (max-width: 900px) {
+    .head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (hover: none) {
+    .tip,
+    .keys {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .tabs {
+      flex-wrap: wrap;
+      width: auto;
+      gap: 6px;
+      padding: 0;
+      overflow: visible;
+      background: none;
+      box-shadow: none;
+    }
+    [role='tab'] {
+      height: 32px;
+      box-shadow: inset 0 0 0 1px var(--line-strong);
+    }
+    .keys {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/showcase'
+</script>

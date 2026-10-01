@@ -1,0 +1,563 @@
+---
+import KubeStacksLogo from './logos/KubeStacksLogo.astro'
+import GithubMark from './logos/GithubMark.astro'
+import { icon } from '../lib/icons'
+import { site } from '../lib/site'
+import { latestAtBuild } from '../lib/latest-release'
+import { LATEST_URL, fileSize, fileUrl, releaseDay, releasePage, versionTag } from '../lib/releases'
+
+// Links to the latest release's files, as of the build; the page checks again when it loads.
+const dl = await latestAtBuild()
+
+const linux = [
+  { kind: 'appimage', label: 'AppImage' },
+  { kind: 'deb', label: '.deb' },
+  { kind: 'rpm', label: '.rpm' },
+] as const
+
+const build =
+  'git clone https://github.com/KubeStacks/KubeStacks && cd KubeStacks && npm ci && npm run dist'
+---
+
+<section class="download" id="download">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="head">
+      <KubeStacksLogo size={64} class="mark" />
+      <h2 class="h2">Get KubeStacks.</h2>
+      <p class="lead">
+        Free and open source under the Apache 2.0 license. No telemetry, no accounts. It talks to
+        the clusters in your kubeconfig and nothing else.
+      </p>
+      <p class="status" data-dl-status hidden={!dl}>
+        <span
+          class="pill"
+          data-health="healthy"
+          set:html={`${icon('circle-check', 2.25)}<span>Latest</span>`}
+        />
+        <span>
+          Version <b data-dl-version>{versionTag(dl)}</b>, released{' '}
+          <span data-dl-date>{releaseDay(dl)}</span>.
+        </span>
+        <a href={releasePage(dl)} data-dl-notes target="_blank" rel="noopener">
+          Release notes
+        </a>
+        <a href={fileUrl(dl, 'sums')} data-dl="sums" target="_blank" rel="noopener">
+          SHA-256 checksums
+        </a>
+      </p>
+      <p class="status" data-dl-fallback hidden={!!dl}>
+        Every installer is on
+        <a href={LATEST_URL} target="_blank" rel="noopener">
+          the latest GitHub release
+        </a>
+        .
+      </p>
+    </div>
+
+    <ul class="platforms">
+      <li data-platform="mac">
+        <div class="p-head">
+          <h3>macOS</h3>
+          <span class="p-yours">Your system</span>
+        </div>
+        <p class="p-info">macOS 12 or later. Signed and notarized by Apple.</p>
+        <div class="p-btns">
+          <a
+            class="btn btn-secondary p-btn"
+            href={fileUrl(dl, 'mac.dmg.arm64')}
+            data-dl="mac.dmg.arm64"
+            data-arch="arm64"
+          >
+            <Fragment set:html={icon('download')} />
+            Apple silicon
+            <span class="size" data-dl-size="mac.dmg.arm64">
+              {fileSize(dl, 'mac.dmg.arm64')}
+            </span>
+          </a>
+          <a
+            class="btn btn-secondary p-btn"
+            href={fileUrl(dl, 'mac.dmg.x64')}
+            data-dl="mac.dmg.x64"
+            data-arch="x64"
+          >
+            <Fragment set:html={icon('download')} />
+            Intel
+            <span class="size" data-dl-size="mac.dmg.x64">
+              {fileSize(dl, 'mac.dmg.x64')}
+            </span>
+          </a>
+        </div>
+        <p class="p-more">
+          Disk images (.dmg). Also as .zip for{' '}
+          <a href={fileUrl(dl, 'mac.zip.arm64')} data-dl="mac.zip.arm64">
+            Apple silicon
+          </a>{' '}
+          and{' '}
+          <a href={fileUrl(dl, 'mac.zip.x64')} data-dl="mac.zip.x64">
+            Intel
+          </a>
+          .
+        </p>
+      </li>
+
+      <li data-platform="windows">
+        <div class="p-head">
+          <h3>Windows</h3>
+          <span class="p-yours">Your system</span>
+        </div>
+        <p class="p-info">Windows 10 or later, on x64 and arm64.</p>
+        <div class="p-btns">
+          <a
+            class="btn btn-secondary p-btn"
+            href={fileUrl(dl, 'windows.exe')}
+            data-dl="windows.exe"
+            data-arch="any"
+          >
+            <Fragment set:html={icon('download')} />
+            Installer
+            <span class="size" data-dl-size="windows.exe">
+              {fileSize(dl, 'windows.exe')}
+            </span>
+          </a>
+        </div>
+        <p class="p-more">
+          Not code-signed yet. If Windows warns you, choose More info, then Run anyway.
+        </p>
+      </li>
+
+      <li data-platform="linux">
+        <div class="p-head">
+          <h3>Linux</h3>
+          <span class="p-yours">Your system</span>
+        </div>
+        <p class="p-info">A recent 64-bit distribution.</p>
+        <table class="l-table">
+          <thead>
+            <tr>
+              <th>
+                <span class="visually-hidden">Format</span>
+              </th>
+              <th>x64</th>
+              <th>arm64</th>
+            </tr>
+          </thead>
+          <tbody>
+            {linux.map((f) => (
+              <tr>
+                <th>{f.label}</th>
+                {(['x64', 'arm64'] as const).map((a) => (
+                  <td>
+                    <a
+                      href={fileUrl(dl, `linux.${f.kind}.${a}`)}
+                      data-dl={`linux.${f.kind}.${a}`}
+                      data-arch={a}
+                    >
+                      <Fragment set:html={icon('download')} />
+                      <span data-dl-size={`linux.${f.kind}.${a}`}>
+                        {fileSize(dl, `linux.${f.kind}.${a}`, 'Download')}
+                      </span>
+                    </a>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </li>
+    </ul>
+
+    <div class="extra">
+      <div class="build">
+        <div class="b-label">
+          <span>Or build it yourself</span>
+          <span class="b-needs">Node.js 24 or later</span>
+        </div>
+        <div class="b-cmd">
+          <code id="build-cmd">{build}</code>
+          <button
+            type="button"
+            class="copy"
+            data-copy="#build-cmd"
+            aria-label="Copy the build commands"
+          >
+            <span class="i-copy" set:html={icon('copy')} />
+            <span class="i-done" set:html={icon('check')} />
+          </button>
+        </div>
+      </div>
+      <dl class="reqs">
+        <div>
+          <dt>Kubernetes</dt>
+          <dd>1.25 or later</dd>
+        </div>
+        <div>
+          <dt>kubectl</dt>
+          <dd>Not needed</dd>
+        </div>
+        <div>
+          <dt>Helm</dt>
+          <dd>Only to change releases</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="cta">
+      <a class="btn btn-primary" href={site.repo} target="_blank" rel="noopener">
+        <GithubMark size={17} />
+        Star on GitHub
+      </a>
+      <a class="btn btn-secondary" href={site.releases} target="_blank" rel="noopener">
+        All releases
+        <Fragment set:html={icon('arrow-up-right')} />
+      </a>
+    </div>
+  </div>
+  <script is:inline type="application/json" id="downloads-data" set:html={JSON.stringify(dl)} />
+</section>
+
+<style>
+  .download {
+    position: relative;
+    padding-block: clamp(72px, 10vw, 140px);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--download-glow);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%);
+    mask-image: linear-gradient(to bottom, transparent, #000 18%);
+  }
+
+  .head {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 1.25rem;
+    margin-bottom: clamp(40px, 5vw, 64px);
+  }
+
+  .head :global(.mark) {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 12px 24px rgb(57 135 229 / 0.45));
+  }
+
+  .head .lead {
+    margin-inline: auto;
+  }
+
+  .status {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px 14px;
+    font-size: 0.875rem;
+    color: var(--text-2);
+  }
+
+  .status[hidden] {
+    display: none;
+  }
+
+  .status b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .status a {
+    color: var(--text-1);
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+
+  .status a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .platforms {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .platforms > li {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: box-shadow 200ms ease;
+  }
+
+  .platforms > li[data-yours] {
+    box-shadow:
+      inset 0 0 0 1px rgb(57 135 229 / 0.55),
+      0 20px 60px -30px rgb(57 135 229 / 0.6);
+  }
+
+  .p-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .p-head h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .p-yours {
+    display: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent-strong);
+  }
+
+  [data-yours] .p-yours {
+    display: inline;
+  }
+
+  .p-info {
+    color: var(--text-2);
+    font-size: 0.9375rem;
+  }
+
+  .p-btns {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .p-btn {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .p-btn .size {
+    margin-left: auto;
+    font: 500 12px/1 var(--font-mono);
+    color: var(--text-3);
+  }
+
+  /* Your platform's file, for your chip, is the one to press. */
+  [data-yours] .p-btn[data-pick] {
+    background: var(--accent);
+    color: #fff;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 8px 24px -10px rgb(57 135 229 / 0.6);
+  }
+
+  [data-yours] .p-btn[data-pick]:hover {
+    background: var(--accent-hover);
+  }
+
+  [data-yours] .p-btn[data-pick] .size {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .p-more {
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-3);
+  }
+
+  .p-more a {
+    color: var(--text-2);
+    text-underline-offset: 3px;
+  }
+
+  .l-table {
+    width: 100%;
+    margin-top: 6px;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .l-table th,
+  .l-table td {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .l-table thead th {
+    padding-top: 0;
+    font: 500 0.75rem/1.4 var(--font-mono);
+    color: var(--text-3);
+  }
+
+  .l-table tbody th {
+    color: var(--text-1);
+  }
+
+  .l-table a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    margin-left: -8px;
+    border-radius: 7px;
+    font: 500 12px/1 var(--font-mono);
+    color: var(--text-2);
+    text-decoration: none;
+  }
+
+  .l-table a:hover {
+    background: var(--tint-strong);
+    color: var(--text-1);
+  }
+
+  .l-table a[data-pick] {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+  }
+
+  .l-table a :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .extra {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .build,
+  .reqs {
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    min-width: 0;
+  }
+
+  .b-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .b-needs {
+    color: var(--text-3);
+    font-weight: 400;
+  }
+
+  .b-cmd {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 4px 4px 14px;
+    border-radius: 10px;
+    background: var(--code-bg);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .b-cmd code {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-2);
+    padding-block: 7px;
+  }
+
+  .copy {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+
+  .copy:hover {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .copy :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .copy .i-done,
+  .copy[data-done] .i-copy {
+    display: none;
+  }
+
+  .copy[data-done] .i-done {
+    display: grid;
+    color: var(--good-text);
+  }
+
+  .reqs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    align-content: center;
+  }
+
+  .reqs dt {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .reqs dd {
+    margin: 4px 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .cta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: clamp(40px, 5vw, 56px);
+  }
+
+  @media (max-width: 900px) {
+    .platforms,
+    .extra {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .reqs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/copy'
+</script>

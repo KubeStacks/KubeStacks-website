@@ -1,0 +1,498 @@
+---
+import GithubMark from './logos/GithubMark.astro'
+import { icon } from '../lib/icons'
+import { site } from '../lib/site'
+import { latestAtBuild } from '../lib/latest-release'
+import { releaseHeadline, releasePage, versionTag } from '../lib/releases'
+
+const dl = await latestAtBuild()
+---
+
+<section class="hero" id="top">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="copy">
+      <a class="release" href={releasePage(dl)} data-dl-notes target="_blank" rel="noopener">
+        <span
+          class="pill"
+          data-health="healthy"
+          set:html={`${icon('circle-check', 2.25)}<span>Running</span>`}
+        />
+        <span data-dl-headline>{releaseHeadline(dl)}</span>
+        <Fragment set:html={icon('arrow-right')} />
+      </a>
+
+      <h1>
+        Your clusters,
+        <br />
+        <span class="dim">at a glance.</span>
+      </h1>
+
+      <p class="lead">
+        KubeStacks is a fast desktop app for Kubernetes. It shows what’s healthy, what’s struggling
+        and where your capacity goes, across every cluster in your kubeconfig.
+      </p>
+
+      <div class="get">
+        <div class="ctas">
+          <a class="btn btn-primary" href="#download" data-hero-download>
+            <Fragment set:html={icon('download')} />
+            <span data-hero-label>Download</span>
+            <span class="tag" data-dl-version>
+              {versionTag(dl)}
+            </span>
+          </a>
+          <a class="btn btn-secondary" href={site.repo} target="_blank" rel="noopener">
+            <GithubMark size={17} />
+            Star on GitHub
+          </a>
+        </div>
+        <p class="dl-note" data-hero-note hidden></p>
+      </div>
+
+      <ul class="facts">
+        <li>Free and open source</li>
+        <li>macOS, Windows and Linux</li>
+        <li>No telemetry, no accounts</li>
+      </ul>
+    </div>
+
+    <div class="stage" data-cluster>
+      <canvas
+        role="img"
+        aria-label="A live picture of a Kubernetes cluster: four nodes on a plate, with 38 pods drawn as cubes colored by health. Five are failing, three have warnings."
+      ></canvas>
+      <div class="tip" data-tip hidden></div>
+
+      <div class="health" aria-live="polite">
+        <h2>Pod health</h2>
+        <div class="bar" aria-hidden="true">
+          <i data-seg="healthy" style="flex-grow: 28"></i>
+          <i data-seg="progressing" style="flex-grow: 0" data-empty="true"></i>
+          <i data-seg="warning" style="flex-grow: 3"></i>
+          <i data-seg="critical" style="flex-grow: 5"></i>
+          <i data-seg="neutral" style="flex-grow: 2"></i>
+        </div>
+        <ul class="legend">
+          <li>
+            <span class="dot" data-health="healthy"></span>Running <b data-count="healthy">28</b>
+          </li>
+          <li>
+            <span class="dot" data-health="warning"></span>Warning <b data-count="warning">3</b>
+          </li>
+          <li>
+            <span class="dot" data-health="critical"></span>Failing <b data-count="critical">5</b>
+          </li>
+          <li>
+            <span class="dot" data-health="progressing"></span>Starting{' '}
+            <b data-count="progressing">0</b>
+          </li>
+          <li>
+            <span class="dot" data-health="neutral"></span>Completed <b data-count="neutral">2</b>
+          </li>
+        </ul>
+        <p class="health-note" data-note data-state="hint">
+          <span class="n-hint">
+            <span class="when-hover">Hover a pod. Click a failing one to restart it.</span>
+            <span class="when-touch">Tap a pod. Tap a failing one again to restart it.</span>
+          </span>
+          <span class="n-clear">Everything’s running. Nice work.</span>
+          <code class="n-cmd" data-cmd></code>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    container-type: inline-size;
+    position: relative;
+    padding-block: calc(64px + clamp(40px, 7vw, 96px)) clamp(48px, 7vw, 96px);
+    isolation: isolate;
+  }
+
+  /* The app icon's radial glow, spread over the page. */
+  .glow {
+    position: absolute;
+    inset: 0 0 -20%;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--hero-glow);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+    gap: clamp(24px, 3vw, 48px);
+  }
+
+  .copy {
+    display: grid;
+    justify-items: start;
+    gap: 1.75rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .copy > * {
+    animation: rise 700ms var(--ease-out) both;
+  }
+  .copy > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .copy > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+  .copy > :nth-child(4) {
+    animation-delay: 240ms;
+  }
+  .copy > :nth-child(5) {
+    animation-delay: 320ms;
+  }
+
+  .release {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 4px 12px 4px 4px;
+    border-radius: 999px;
+    background: var(--tint);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    text-decoration: none;
+    transition: background-color 150ms ease;
+  }
+
+  .release:hover {
+    background: var(--tint-strong);
+    color: var(--text-1);
+  }
+
+  .release > :global(svg) {
+    width: 14px;
+    height: 14px;
+    transition: transform 160ms ease;
+  }
+
+  .release:hover > :global(svg) {
+    transform: translateX(2px);
+  }
+
+  h1 {
+    font-size: var(--step-display);
+    font-weight: 620;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    margin-top: 0.25rem;
+  }
+
+  h1 .dim {
+    color: transparent;
+    background: linear-gradient(100deg, var(--dim-from) 10%, var(--dim-to) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .get {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .dl-note {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .dl-note :global(a) {
+    color: var(--text-2);
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+
+  .dl-note :global(a:hover) {
+    color: var(--text-1);
+    text-decoration-color: currentColor;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .facts li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-3);
+    opacity: 0.6;
+  }
+
+  /* The cluster. It's wider than its column and runs off to the right on big screens. */
+  .stage {
+    position: relative;
+    height: clamp(420px, 42vw, 680px);
+    /* To the window's edge: 100cqw is the hero's width, which leaves out any scrollbar. */
+    margin-right: calc(-1 * max(var(--gutter), (100cqw - var(--max)) / 2));
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .tip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    width: max-content;
+    max-width: min(300px, calc(100% - 16px));
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--popover);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-pop);
+    pointer-events: none;
+    font-size: 12px;
+    line-height: 1.4;
+    display: grid;
+    gap: 6px;
+  }
+
+  .tip :global(.tip-meta) {
+    color: var(--text-3);
+  }
+  .tip :global(.tip-name) {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    overflow-wrap: anywhere;
+  }
+  .tip :global(.tip-row) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tip :global(.tip-dim) {
+    color: var(--text-3);
+  }
+  .tip :global(.tip-action) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+    color: var(--accent-strong);
+    font-weight: 500;
+  }
+  .tip :global(.tip-action svg) {
+    width: 13px;
+    height: 13px;
+  }
+  .tip :global(.tip-meter) {
+    display: grid;
+    grid-template-columns: 30px 1fr 34px;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .tip :global(.tip-meter span:last-child) {
+    text-align: right;
+  }
+  .tip :global(.tip-track) {
+    height: 5px;
+    border-radius: 99px;
+    background: var(--accent-track);
+    overflow: hidden;
+  }
+  .tip :global(.tip-track i) {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent);
+  }
+  .tip :global(.tip-track i[data-hot='true']) {
+    background: var(--warn);
+  }
+
+  /* The app's Pod health card, counting what the cluster shows. */
+  .health {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 296px;
+    padding: 14px 16px 12px;
+    border-radius: 12px;
+    background: var(--glass);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-panel);
+    animation: rise 800ms var(--ease-out) 1.6s both;
+  }
+
+  .health h2 {
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
+    font-variation-settings: normal;
+  }
+
+  .health-note {
+    display: grid;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--text-3);
+  }
+
+  .health-note > * {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 240ms ease;
+    min-width: 0;
+  }
+
+  .health-note[data-state='hint'] .n-hint,
+  .health-note[data-state='clear'] .n-clear,
+  .health-note[data-state='command'] .n-cmd {
+    opacity: 1;
+  }
+
+  .n-clear {
+    color: var(--good-text);
+  }
+
+  .when-touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .when-hover {
+      display: none;
+    }
+    .when-touch {
+      display: inline;
+    }
+  }
+
+  .n-cmd {
+    font-size: 10.5px;
+    color: var(--accent-strong);
+    overflow-wrap: anywhere;
+  }
+
+  .bar {
+    display: flex;
+    gap: 3px;
+    height: 8px;
+  }
+
+  .bar i {
+    flex: 0 1 0;
+    min-width: 0;
+    border-radius: 99px;
+    transition: flex-grow 500ms var(--ease-out);
+  }
+
+  .bar i[data-empty='true'] {
+    margin-left: -3px;
+  }
+
+  .bar [data-seg='healthy'] {
+    background: var(--good);
+  }
+  .bar [data-seg='progressing'] {
+    background: var(--accent);
+  }
+  .bar [data-seg='warning'] {
+    background: var(--warn);
+  }
+  .bar [data-seg='critical'] {
+    background: var(--critical);
+  }
+  .bar [data-seg='neutral'] {
+    background: var(--neutral);
+  }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: 4px 14px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend b {
+    font-weight: 600;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 960px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .stage {
+      margin-right: 0;
+      height: auto;
+      display: grid;
+      gap: 12px;
+    }
+    canvas {
+      height: auto;
+      aspect-ratio: 1.42;
+      max-height: 560px;
+    }
+    .health {
+      position: relative;
+      width: 100%;
+    }
+    .legend {
+      grid-template-columns: repeat(auto-fill, minmax(110px, auto));
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/cluster'
+</script>
