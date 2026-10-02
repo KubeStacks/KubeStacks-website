@@ -2,6 +2,8 @@
 import KubeStacksLogo from './logos/KubeStacksLogo.astro'
 import GithubMark from './logos/GithubMark.astro'
 import ThemeSwitch from './ThemeSwitch.astro'
+import { doc } from '../lib/docs'
+import { icon } from '../lib/icons'
 import { site } from '../lib/site'
 ---
 
@@ -18,8 +20,12 @@ import { site } from '../lib/site'
       <a href="#story">Story</a>
       <a href="#download">Install</a>
     </nav>
+    <a class="docs" href={doc()} target="_blank" rel="noopener" aria-label="Docs">
+      <Fragment set:html={icon('book-open')} />
+      <span>Docs</span>
+    </a>
     <ThemeSwitch />
-    <a class="gh" href={site.repo} target="_blank" rel="noopener">
+    <a class="gh" href={site.repo} target="_blank" rel="noopener" aria-label="GitHub">
       <GithubMark size={17} />
       <span>GitHub</span>
     </a>
@@ -52,6 +58,13 @@ import { site } from '../lib/site'
     height: 64px;
   }
 
+  /* The bar's items keep their size; what doesn't fit goes, by width, in the media queries
+     below. */
+  .nav-inner > *,
+  .nav-inner :global(svg) {
+    flex-shrink: 0;
+  }
+
   .brand {
     display: inline-flex;
     align-items: center;
@@ -69,6 +82,7 @@ import { site } from '../lib/site'
   }
 
   .links a,
+  .docs,
   .gh {
     padding: 0.4rem 0.7rem;
     border-radius: 8px;
@@ -82,9 +96,23 @@ import { site } from '../lib/site'
   }
 
   .links a:hover,
+  .docs:hover,
   .gh:hover {
     color: var(--text-1);
     background: var(--tint-strong);
+  }
+
+  .docs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: -1rem;
+    color: var(--text-1);
+  }
+
+  .docs :global(svg) {
+    width: 16px;
+    height: 16px;
   }
 
   .gh {
@@ -95,18 +123,37 @@ import { site } from '../lib/site'
     box-shadow: inset 0 0 0 1px var(--line-strong);
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     .links {
       display: none;
     }
-    .nav-inner > :global(.switch) {
+    .docs {
       margin-left: auto;
     }
   }
 
-  @media (max-width: 380px) {
+  /* On a phone, Docs and GitHub are their icons alone (each link keeps its name). */
+  @media (max-width: 520px) {
+    .nav-inner {
+      gap: 0.75rem;
+    }
+    .docs span,
     .gh span {
       display: none;
+    }
+    .docs,
+    .gh {
+      padding-inline: 0.6rem;
+    }
+  }
+
+  /* The narrowest phones keep the theme switch and GitHub; the docs are linked below. */
+  @media (max-width: 359px) {
+    .docs {
+      display: none;
+    }
+    .nav-inner > :global(.switch) {
+      margin-left: auto;
     }
   }
 </style>

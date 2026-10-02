@@ -1,14 +1,18 @@
 ---
 /**
- * A feature: its name and what it does, above a working piece of the app (the default
- * slot), which the tile's edge cuts off.
+ * A feature: its name, what it does and its page in the docs, above a working piece of the
+ * app (the default slot), which the tile's edge cuts off.
  */
+import DocLink from '../DocLink.astro'
+import type { DocPath } from '../../lib/docs'
+
 interface Props {
   /** Columns of the 12-column grid. */
   span: 5 | 7
+  docs: DocPath
 }
 
-const { span } = Astro.props
+const { span, docs } = Astro.props
 ---
 
 <article class:list={['tile', `span-${span}`]}>
@@ -19,6 +23,7 @@ const { span } = Astro.props
     <p>
       <slot name="text" />
     </p>
+    <DocLink path={docs} />
   </div>
   <slot />
 </article>
@@ -48,8 +53,13 @@ const { span } = Astro.props
 
   .copy {
     display: grid;
+    justify-items: start;
     gap: 8px;
     max-width: 30rem;
+  }
+
+  .copy > :global(.doc-link) {
+    margin-top: 2px;
   }
 
   h3 {

@@ -1,13 +1,16 @@
 ---
 import KubeStacksLogo from './logos/KubeStacksLogo.astro'
 import SevallaLogo from './logos/SevallaLogo.astro'
+import { doc } from '../lib/docs'
 import { site } from '../lib/site'
 
 const links = [
+  { label: 'Docs', href: doc() },
   { label: 'GitHub', href: site.repo },
   { label: 'Releases', href: site.releases },
-  { label: 'In your cluster', href: site.serverDocs },
-  { label: 'Changelog', href: `${site.repo}/blob/main/CHANGELOG.md` },
+  { label: 'In your cluster', href: doc('server/overview') },
+  { label: 'Changelog', href: doc('changelog') },
+  { label: 'FAQ', href: doc('reference/faq') },
   { label: 'Contributing', href: `${site.repo}/blob/main/CONTRIBUTING.md` },
   { label: 'Security', href: `${site.repo}/blob/main/SECURITY.md` },
   { label: 'Sevalla', href: site.sevalla },

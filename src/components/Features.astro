@@ -18,7 +18,7 @@ import HelmDemo from './features/HelmDemo.astro'
     </div>
 
     <div class="grid">
-      <Tile span={7}>
+      <Tile span={7} docs="explore/health">
         <Fragment slot="title">Problems sort to the top</Fragment>
         <Fragment slot="text">
           Every object gets a clear status, and whatever is failing comes first. You won’t scroll
@@ -27,7 +27,7 @@ import HelmDemo from './features/HelmDemo.astro'
         <ProblemsDemo />
       </Tile>
 
-      <Tile span={5}>
+      <Tile span={5} docs="metrics/live-usage">
         <Fragment slot="title">Usage next to capacity</Fragment>
         <Fragment slot="text">
           Live CPU and memory from metrics-server, set against requests, limits and what each node
@@ -36,7 +36,7 @@ import HelmDemo from './features/HelmDemo.astro'
         <UsageDemo />
       </Tile>
 
-      <Tile span={5}>
+      <Tile span={5} docs="changes/safely">
         <Fragment slot="title">Every change shows its kubectl</Fragment>
         <Fragment slot="text">
           Scale, restart, roll back or drain with guard rails. KubeStacks checks your permissions
@@ -45,7 +45,7 @@ import HelmDemo from './features/HelmDemo.astro'
         <ScaleDemo />
       </Tile>
 
-      <Tile span={7}>
+      <Tile span={7} docs="explore/finding-things">
         <Fragment slot="title">
           <kbd class="kbd">⌘</kbd>
           <kbd class="kbd">K</kbd> goes anywhere
@@ -57,7 +57,7 @@ import HelmDemo from './features/HelmDemo.astro'
         <CommandDemo />
       </Tile>
 
-      <Tile span={7}>
+      <Tile span={7} docs="debug/logs">
         <Fragment slot="title">Logs from every pod, in order</Fragment>
         <Fragment slot="text">
           A workload’s pods merged in the order they wrote, each line marked with its pod. Pods that
@@ -66,7 +66,7 @@ import HelmDemo from './features/HelmDemo.astro'
         <LogsDemo />
       </Tile>
 
-      <Tile span={5}>
+      <Tile span={5} docs="helm/releases">
         <Fragment slot="title">Helm releases, read in place</Fragment>
         <Fragment slot="text">
           Status, values, what a release made and every revision, with a diff between any two. No

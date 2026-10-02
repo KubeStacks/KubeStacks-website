@@ -1,13 +1,24 @@
 ---
+import DocLink from './DocLink.astro'
+import type { DocPath } from '../lib/docs'
 import { VARIANTS, screenshot } from '../lib/screenshots'
 
 // The keys are the app's own: press G, then the letter (shared/navigation.ts in the app).
-const views = [
+const views: {
+  id: string
+  label: string
+  key: string | null
+  shot: string
+  docs: DocPath
+  alt: string
+  caption: string
+}[] = [
   {
     id: 'overview',
     label: 'Overview',
     key: 'O',
     shot: 'overview',
+    docs: 'explore/overview',
     alt: 'The overview: nodes ready, pods running, CPU and memory against capacity, pod health by namespace, and each node’s usage.',
     caption: 'What needs attention, live usage against what’s allocatable, and every node’s load.',
   },
@@ -16,6 +27,7 @@ const views = [
     label: 'Workloads',
     key: 'W',
     shot: 'workloads',
+    docs: 'explore/workloads',
     alt: 'Every workload in one list, sorted with failing and degraded ones first.',
     caption:
       'Deployments, StatefulSets, DaemonSets, Jobs and CronJobs in one list. Failing ones first.',
@@ -25,6 +37,7 @@ const views = [
     label: 'Pods',
     key: 'P',
     shot: 'bulk',
+    docs: 'changes/bulk',
     alt: 'The pods list with three pods selected and a bar to restart or delete them together.',
     caption: 'Pick a few rows, or a hundred, and restart or delete them together.',
   },
@@ -33,6 +46,7 @@ const views = [
     label: 'Metrics',
     key: 'U',
     shot: 'metrics',
+    docs: 'metrics/usage-history',
     alt: 'CPU by namespace over six hours, with a distribution and a ranked table.',
     caption:
       'History from your Prometheus or VictoriaMetrics, found for you. Drag across a chart to zoom.',
@@ -42,6 +56,7 @@ const views = [
     label: 'Logs',
     key: null,
     shot: 'logs',
+    docs: 'debug/logs',
     alt: 'Logs from all three pods of the checkout deployment, merged in order with each line marked by its pod.',
     caption: 'Every pod of a workload, merged in the order lines were written.',
   },
@@ -50,6 +65,7 @@ const views = [
     label: 'Shell',
     key: null,
     shot: 'shell',
+    docs: 'debug/shell',
     alt: 'A shell open in a storefront pod, in the detail panel.',
     caption: 'A terminal in any container, or a debug container in pods that have no shell.',
   },
@@ -58,6 +74,7 @@ const views = [
     label: 'Helm',
     key: 'H',
     shot: 'helm',
+    docs: 'helm/releases',
     alt: 'Helm releases, with the storefront release’s history and a diff of its values between revisions.',
     caption: 'Releases, their values and every revision, with a diff between any two.',
   },
@@ -145,11 +162,12 @@ const shots = views.map((v) =>
     <div class="foot">
       {views.map((v, i) => (
         <p class="caption" data-caption={v.id} hidden={i !== 0}>
-          {v.caption}
+          {v.caption} <DocLink path={v.docs} />
         </p>
       ))}
       <p class="tip">
-        Press <kbd class="kbd">G</kbd> then a letter to switch views, just like in the app.
+        Press <kbd class="kbd">G</kbd> then a letter to switch views, just like in the app.{' '}
+        <DocLink path="reference/keyboard-shortcuts">Every shortcut</DocLink>
       </p>
     </div>
   </div>
@@ -326,6 +344,11 @@ const shots = views.map((v) =>
     gap: 0.75rem 2rem;
     margin-top: 20px;
     font-size: 0.9375rem;
+  }
+
+  .caption :global(.doc-link),
+  .tip :global(.doc-link) {
+    margin-left: 4px;
   }
 
   .caption {

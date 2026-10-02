@@ -1,26 +1,29 @@
 ---
+import { doc, type DocPath } from '../lib/docs'
 import { icon, type IconName } from '../lib/icons'
 import { VARIANTS, screenshot } from '../lib/screenshots'
-import { site } from '../lib/site'
 
 // The chart's auth.mode, and what each means for who KubeStacks acts as (docs/server.md).
-const modes: { icon: IconName; title: string; mode: string; text: string }[] = [
+const modes: { icon: IconName; title: string; mode: string; docs: DocPath; text: string }[] = [
   {
     icon: 'key-round',
     title: 'With a token',
     mode: 'token',
+    docs: 'server/auth/tokens',
     text: 'People paste a token the cluster accepts, a service account’s or one from your identity provider, and the cluster checks each request made with it. KubeStacks’ own service account needs no permissions.',
   },
   {
     icon: 'log-in',
     title: 'With single sign-on',
     mode: 'oidc',
+    docs: 'server/auth/single-sign-on',
     text: 'Dex, Keycloak, Okta, Entra ID, Google or GitLab. KubeStacks acts as whoever signs in, or passes their own token on when the API server already trusts the provider.',
   },
   {
     icon: 'shield-check',
     title: 'Behind a proxy',
     mode: 'proxy',
+    docs: 'server/auth/proxy',
     text: 'oauth2-proxy or Pomerium signs people in and names them in a header. The chart’s network policy keeps out everything but the proxy.',
   },
 ]
@@ -107,7 +110,12 @@ const notes: { icon: IconName; html: string }[] = [
             <li>
               <span class="ic" set:html={icon(m.icon)} />
               <div class="m-head">
-                <h3>{m.title}</h3>
+                <h3>
+                  <a href={doc(m.docs)} target="_blank" rel="noopener">
+                    {m.title}
+                    <Fragment set:html={icon('arrow-up-right')} />
+                  </a>
+                </h3>
                 <code>auth.mode: {m.mode}</code>
               </div>
               <p>{m.text}</p>
@@ -119,7 +127,7 @@ const notes: { icon: IconName; html: string }[] = [
             <Fragment set:html={icon('ship-wheel')} />
             Install the chart
           </a>
-          <a class="btn btn-secondary" href={site.serverDocs} target="_blank" rel="noopener">
+          <a class="btn btn-secondary" href={doc('server/overview')} target="_blank" rel="noopener">
             Read the docs
             <Fragment set:html={icon('arrow-up-right')} />
           </a>
@@ -376,6 +384,33 @@ const notes: { icon: IconName; html: string }[] = [
     font-size: 0.9375rem;
     font-weight: 600;
     letter-spacing: -0.01em;
+  }
+
+  /* Each way opens its guide in the docs. */
+  .m-head h3 a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .m-head h3 a :global(svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--text-3);
+    transition:
+      color 150ms ease,
+      transform 160ms ease;
+  }
+
+  .m-head h3 a:hover {
+    color: var(--accent-strong);
+  }
+
+  .m-head h3 a:hover :global(svg) {
+    color: currentColor;
+    transform: translate(1px, -1px);
   }
 
   .m-head code {
