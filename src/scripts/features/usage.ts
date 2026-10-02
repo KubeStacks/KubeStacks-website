@@ -40,10 +40,10 @@ export function mountUsage(root: HTMLElement) {
     line.setAttribute('d', d)
     area.setAttribute('d', `${d} L${WIDTH} ${HEIGHT} L0 ${HEIGHT} Z`)
     const last = values.at(-1)!
-    end.style.top = `${points.at(-1)![1]}px`
+    end.style.setProperty('--y', `${points.at(-1)![1]}px`)
     pct.textContent = String(Math.round(last * 100))
     cores.textContent = (last * ALLOCATABLE).toFixed(1)
-    fill.style.width = `${(last * 100).toFixed(1)}%`
+    fill.style.setProperty('--v', last.toFixed(3))
     meter.setAttribute('aria-valuenow', String(Math.round(last * 100)))
   }
 

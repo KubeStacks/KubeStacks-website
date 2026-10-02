@@ -3,6 +3,11 @@
  * The top plate holds four nodes; each pod is a cube colored by its health, the way the
  * app's Pod health card counts them. It boots, settles and rolls out on its own, and
  * failing pods can be restarted by clicking them.
+ *
+ * It draws only as often as it must: every frame for the intro and while it follows the
+ * pointer, 30 a second while pods arrive, change or leave, 20 while only glows pulse, and
+ * none while it's off screen or the tab is hidden. With reduced motion, nothing moves, so it
+ * draws only when something changes.
  */
 import { DEMO_CLUSTER } from '../../lib/demo-cluster'
 import { escapeHtml } from '../../lib/html'
@@ -82,7 +87,9 @@ const randomSuffix = () => {
 
 export function mountCluster(root: HTMLElement) {
   const canvas = root.querySelector('canvas')!
-  const ctx = canvas.getContext('2d')!
+  const screen = canvas.getContext('2d')!
+  /** Where drawing goes: the screen, or the backdrop while it's painted (see draw). */
+  let ctx = screen
   const tip = root.querySelector<HTMLElement>('[data-tip]')!
   const card = root.querySelector<HTMLElement>('.health')!
   const note = root.querySelector<HTMLElement>('[data-note]')!
@@ -96,6 +103,15 @@ export function mountCluster(root: HTMLElement) {
   // settles into the health it really has, which is how a cluster looks coming up.
   const BOOT = 700
   const SETTLE = reduced ? 0 : 2100
+  /** When the plates, nodes and labels have come in. */
+  const INTRO = 1900
+  /** How long a pod takes to drop in, fade to a new color, fade out, and ring. */
+  const DROP = 520
+  const FADE = 450
+  const LEAVE = 380
+  const RING = 900
+  /** How far a pod rises under the pointer. */
+  const LIFT = 0.22
 
   let W = 0
   let H = 0
@@ -111,6 +127,7 @@ export function mountCluster(root: HTMLElement) {
   let ready = false
   let visible = false
   let frame = 0
+  let wait = 0
   let nextId = 0
 
   const clock = () => now - start
@@ -168,6 +185,7 @@ export function mountCluster(root: HTMLElement) {
     pod.health = health
     pod.label = label
     pod.ring = clock()
+    wake()
   }
 
   /** The health a pod shows: during the boot wave, everything is still starting. */
@@ -177,14 +195,16 @@ export function mountCluster(root: HTMLElement) {
 
   function currentColor(pod: Pod): RGB {
     if (clock() < pod.colorAt) return pod.colorFrom
-    return mix(pod.colorFrom, STATUS[pod.health], ease.inOut(clamp((clock() - pod.colorAt) / 450)))
+    // With reduced motion, a pod takes its new color at once.
+    const fade = reduced ? 1 : clamp((clock() - pod.colorAt) / FADE)
+    return mix(pod.colorFrom, STATUS[pod.health], ease.inOut(fade))
   }
 
   /** How far a pod has appeared, from its drop-in to its fade when it's removed. */
   function podAppear(pod: Pod) {
     if (reduced) return 1
-    const shown = clamp((clock() - pod.born) / 520)
-    return pod.dying ? Math.min(shown, 1 - clamp((clock() - pod.dying) / 380)) : shown
+    const shown = clamp((clock() - pod.born) / DROP)
+    return pod.dying ? Math.min(shown, 1 - clamp((clock() - pod.dying) / LEAVE)) : shown
   }
 
   /** Where a pod rests: on its node, or (unscheduled) floating above the plate. */
@@ -231,10 +251,13 @@ export function mountCluster(root: HTMLElement) {
     W = r.width
     H = r.height
     dpr = Math.min(window.devicePixelRatio, 2)
-    canvas.width = Math.round(W * dpr)
-    canvas.height = Math.round(H * dpr)
+    canvas.width = backdrop.width = Math.round(W * dpr)
+    canvas.height = backdrop.height = Math.round(H * dpr)
+    backdropKey = ''
     view = fit(W, H)
     placeCard()
+    // Resizing clears the canvas: draw it again before the screen shows it blank.
+    if (ready) draw()
   }
 
   /** The health card sits in the empty corner under the plate's front-right edge. */
@@ -303,17 +326,61 @@ export function mountCluster(root: HTMLElement) {
     ctx.restore()
   }
 
+  // The plates and nodes change only with the intro, the pointer, scrolling, a hovered node
+  // and the theme. They're painted into this canvas when one of those does, and copied onto
+  // the screen each frame: their large gradients are most of a frame's work.
+  const backdrop = document.createElement('canvas')
+  const backdropCtx = backdrop.getContext('2d')!
+  let backdropKey = ''
+
   function draw() {
     const t = clock()
     const intro = (delay: number, duration = 900) =>
       reduced ? 1 : ease.outExpo(clamp((t - delay) / duration))
+    const plateIn = intro(240, 1100)
+    const z0 = -(1 - plateIn) * 1.5
+    const key = [
+      Math.min(t, INTRO),
+      pointer.sx.toFixed(3),
+      pointer.sy.toFixed(3),
+      scrolled,
+      hoveredNode,
+    ]
+    if (key.join() !== backdropKey) {
+      backdropKey = key.join()
+      ctx = backdropCtx
+      paintBackdrop(intro, plateIn, z0)
+      ctx = screen
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(backdrop, 0, 0)
+    flat()
+
+    const zTile = z0 + TILE_T
+    ctx.globalAlpha = 1
+    ctx.globalCompositeOperation = pal.glow
+    for (const pod of pods) drawGlow(pod, pod.node === UNSCHEDULED ? z0 : zTile)
+    ctx.globalCompositeOperation = 'source-over'
+
+    for (const pod of pods) if (pod.node === UNSCHEDULED) drawWaiting(pod, z0)
+    for (const pod of [...pods].sort((a, b) => depth(a) - depth(b))) drawPod(pod, zTile)
+    ctx.globalAlpha = 1
+  }
+
+  /** The mark's lower plates, the cluster plate with its name, and the nodes. */
+  function paintBackdrop(
+    intro: (delay: number, duration?: number) => number,
+    plateIn: number,
+    z0: number,
+  ) {
     const spread = scrolled * 1.6
-    ctx.clearRect(0, 0, W, H)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.clearRect(0, 0, backdrop.width, backdrop.height)
     flat()
 
     // The mark's two lower plates, rising into place.
     const layers = [intro(0, 1100), intro(120, 1100)]
-    const plateIn = intro(240, 1100)
     pal.ghost.forEach(([from, to, edge], i) => {
       const below = 2 - i
       const z = -LAYER_GAP * below - BASE_T - spread * below - (1 - layers[i]!) * (2.5 - i * 0.5)
@@ -339,7 +406,6 @@ export function mountCluster(root: HTMLElement) {
     })
 
     // The cluster plate, with a faint survey grid and lit back edges.
-    const z0 = -(1 - plateIn) * 1.5
     ctx.globalAlpha = plateIn
     slab([0, 0, BASE, BASE], [z0 - BASE_T, z0], -4, [
       gradient(z0, -4, pal.baseTop),
@@ -392,15 +458,6 @@ export function mountCluster(root: HTMLElement) {
       if (appear === 0) continue
       drawNode(n, i, z0, appear * plateIn, labels)
     }
-
-    const zTile = z0 + TILE_T
-    ctx.globalAlpha = 1
-    ctx.globalCompositeOperation = pal.glow
-    for (const pod of pods) drawGlow(pod, pod.node === UNSCHEDULED ? z0 : zTile)
-    ctx.globalCompositeOperation = 'source-over'
-
-    for (const pod of pods) if (pod.node === UNSCHEDULED) drawWaiting(pod, z0)
-    for (const pod of [...pods].sort((a, b) => depth(a) - depth(b))) drawPod(pod, zTile)
     ctx.globalAlpha = 1
   }
 
@@ -469,9 +526,11 @@ export function mountCluster(root: HTMLElement) {
     const at = P(x, y, z, -1)
     if ((health === 'critical' || health === 'warning') && appear > 0) {
       const critical = health === 'critical'
-      const pulse = critical
-        ? 0.65 + 0.35 * Math.sin((clock() / 1000) * Math.PI * 1.1 + pod.id)
-        : 0.45
+      const pulse = !critical
+        ? 0.45
+        : reduced
+          ? 0.8
+          : 0.65 + 0.35 * Math.sin((clock() / 1000) * Math.PI * 1.1 + pod.id)
       const r = view.k * (critical ? 1.7 : 1.2)
       ellipse(at, r, () => {
         const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r)
@@ -481,9 +540,9 @@ export function mountCluster(root: HTMLElement) {
         ctx.fill()
       })
     }
-    // A ring goes off when a pod changes state.
-    const ring = (clock() - pod.ring) / 900
-    if (ring >= 0 && ring <= 1) {
+    // A ring goes off when a pod changes state (with motion).
+    const ring = (clock() - pod.ring) / RING
+    if (!reduced && ring >= 0 && ring <= 1) {
       ellipse(at, view.k * (0.5 + ease.outCubic(ring) * 1.3), () => {
         ctx.strokeStyle = rgba(STATUS[pod.health], (1 - ring) * 0.8)
         ctx.lineWidth = 2
@@ -513,16 +572,21 @@ export function mountCluster(root: HTMLElement) {
     if (appear === 0) return
     const { x, y } = slotCenter(pod.node, pod.slot)
     const hot = hovered === pod
-    pod.lift += ((hot ? 0.22 : 0) - pod.lift) * 0.2
-    const drop = reduced ? 0 : (1 - ease.outCubic(clamp((t - pod.born) / 520))) * 2.4
-    const shrink = pod.dying ? clamp((t - pod.dying) / 380) : 0
+    const lift = hot ? LIFT : 0
+    pod.lift = reduced ? lift : pod.lift + (lift - pod.lift) * 0.2
+    const drop = reduced ? 0 : (1 - ease.outCubic(clamp((t - pod.born) / DROP))) * 2.4
+    const shrink = pod.dying ? clamp((t - pod.dying) / LEAVE) : 0
     const plateZ = zTile - TILE_T
     const z0 = plateZ + restZ(pod) + drop + pod.lift
     const h = CUBE_H * (1 - shrink * 0.9)
     const s = (CUBE / 2) * (1 - shrink * 0.4)
     const c = currentColor(pod)
     const starting = shownHealth(pod) === 'progressing'
-    const glow = starting ? 0.5 + 0.5 * Math.sin((t / 1000) * Math.PI * 2.2 + pod.id) : 0
+    const glow = !starting
+      ? 0
+      : reduced
+        ? 0.5
+        : 0.5 + 0.5 * Math.sin((t / 1000) * Math.PI * 2.2 + pod.id)
     const lit = 0.08 + glow * 0.18 + (hot ? 0.14 : 0)
     const onDownNode = pod.node !== UNSCHEDULED && NODES[pod.node]!.health === 'critical'
     ctx.globalAlpha = appear * (onDownNode ? 0.55 : 1)
@@ -608,6 +672,8 @@ export function mountCluster(root: HTMLElement) {
   // The tooltip, in the app's popover style. It's placed every frame while something is
   // under the pointer, but its markup only changes when what it says does.
   let tipHtml = ''
+  let tipWidth = 0
+  let tipAt = ''
 
   function showTip() {
     if (hovered) {
@@ -644,17 +710,20 @@ export function mountCluster(root: HTMLElement) {
   }
 
   function setTip(html: string) {
+    tip.hidden = false
     if (html === tipHtml) return
     tipHtml = html
     tip.innerHTML = html
+    // Measured once it shows, so its real width keeps it inside the stage.
+    tipWidth = tip.offsetWidth
   }
 
   function placeTip(x: number, y: number) {
-    // Shown before it's measured, so its real width keeps it inside the stage.
-    tip.hidden = false
-    const w = tip.offsetWidth
-    const left = clamp(x - w / 2, 8, Math.max(8, W - w - 8))
-    tip.style.transform = `translate(${Math.round(left)}px, ${Math.round(y - 12)}px) translateY(-100%)`
+    const left = clamp(x - tipWidth / 2, 8, Math.max(8, W - tipWidth - 8))
+    const at = `translate(${Math.round(left)}px, ${Math.round(y - 12)}px) translateY(-100%)`
+    if (at === tipAt) return
+    tipAt = at
+    tip.style.transform = at
   }
 
   // The Pod health card ---------------------------------------------------------------
@@ -670,11 +739,24 @@ export function mountCluster(root: HTMLElement) {
     if (key === shownCounts) return
     shownCounts = key
     for (const [h, n] of c) counts.get(h)!.textContent = String(n)
+    // The bar's segments take their new widths at once, and glide there from the old ones on
+    // the compositor (a transition of their widths would lay the card out every frame).
+    const before = [...segments].map((s) => s.getBoundingClientRect())
     segments.forEach((s) => {
       const n = c.get(s.dataset.seg as Health)!
       s.style.flexGrow = String(n)
       s.dataset.empty = String(n === 0)
     })
+    if (!reduced)
+      segments.forEach((s, i) => {
+        const after = s.getBoundingClientRect()
+        if (after.width === 0) return
+        const from = `translateX(${before[i]!.left - after.left}px) scaleX(${before[i]!.width / after.width})`
+        s.animate([{ transform: from }, { transform: 'none' }], {
+          duration: 500,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        })
+      })
     if (!restarting)
       note.dataset.state = c.get('critical') === 0 && clock() > SETTLE + 1500 ? 'clear' : 'hint'
   }
@@ -708,6 +790,7 @@ export function mountCluster(root: HTMLElement) {
   function retire(pod: Pod, after: number, then?: () => void) {
     later(after, () => {
       pod.dying = clock()
+      wake()
       later(400, () => {
         removePod(pod)
         then?.()
@@ -785,7 +868,7 @@ export function mountCluster(root: HTMLElement) {
     let tick = 0
     const next = () => {
       // Nothing happens while nobody can see it.
-      if (visible) events[tick++ % events.length]!()
+      if (showing()) events[tick++ % events.length]!()
       later(tick % 4 === 1 ? 7600 : 4200 + Math.random() * 1600, next)
     }
     later(SETTLE + 3600, next)
@@ -793,14 +876,50 @@ export function mountCluster(root: HTMLElement) {
 
   // Running -------------------------------------------------------------------------
 
+  /** Frames a second while pods arrive, change or leave, and while only glows pulse. */
+  const LIVELY_FPS = 30
+  const CALM_FPS = 20
+
+  const showing = () => ready && visible && !document.hidden
+
+  /** How long until the next frame is needed: 0 for the very next one. */
+  function pace() {
+    const t = clock()
+    const following =
+      Math.abs(pointer.x - pointer.sx) + Math.abs(pointer.y - pointer.sy) > 0.001 ||
+      pods.some((pod) => Math.abs(pod.lift - (hovered === pod ? LIFT : 0)) > 0.002)
+    if (t < INTRO || following) return 0
+    const lively = pods.some(
+      (pod) =>
+        pod.dying > 0 ||
+        t - pod.born < DROP ||
+        (t >= pod.colorAt && t - pod.colorAt < FADE) ||
+        t - pod.ring <= RING,
+    )
+    return 1000 / (lively ? LIVELY_FPS : CALM_FPS)
+  }
+
+  /** Draws a frame when the screen next updates, unless one is already coming. */
+  function wake() {
+    if (frame || !showing()) return
+    window.clearTimeout(wait)
+    frame = requestAnimationFrame(loop)
+  }
+
   function loop(ts: number) {
+    frame = 0
     now = ts
     pointer.sx += (pointer.x - pointer.sx) * 0.06
     pointer.sy += (pointer.y - pointer.sy) * 0.06
     draw()
     updateLegend()
     if (hovered || hoveredNode !== null) showTip()
-    frame = visible ? requestAnimationFrame(loop) : 0
+    // With reduced motion, the next frame comes with the next change.
+    if (reduced) return
+    const next = pace()
+    // A frame waits for the screen too (up to one refresh): ask for it a little early.
+    if (next === 0) wake()
+    else wait = window.setTimeout(wake, next - 8)
   }
 
   function pointAt(e: MouseEvent): Point {
@@ -810,11 +929,16 @@ export function mountCluster(root: HTMLElement) {
 
   canvas.addEventListener('pointermove', (e) => {
     const [px, py] = pointAt(e)
-    pointer.x = clamp(px / W)
-    pointer.y = clamp(py / H)
+    // The plates follow the pointer a little, with motion.
+    if (!reduced) {
+      pointer.x = clamp(px / W)
+      pointer.y = clamp(py / H)
+      wake()
+    }
     // A finger has no hover: a tap shows what's there (see the click handler).
     if (e.pointerType === 'touch') return
     const hit = hitTest([px, py])
+    if (hit.pod !== hovered || hit.node !== hoveredNode) wake()
     hovered = hit.pod
     hoveredNode = hit.node
     canvas.style.cursor = hit.pod?.health === 'critical' ? 'pointer' : 'default'
@@ -824,6 +948,7 @@ export function mountCluster(root: HTMLElement) {
   canvas.addEventListener('pointerleave', (e) => {
     pointer.x = 0.5
     pointer.y = 0.5
+    wake()
     // A finger leaves after every tap; what it tapped stays shown until the next one.
     if (e.pointerType === 'touch') return
     hovered = null
@@ -845,19 +970,22 @@ export function mountCluster(root: HTMLElement) {
     hoveredNode = hit.pod ? null : hit.node
     if (hit.pod?.health === 'critical' && (!touch || again)) restart(hit.pod)
     showTip()
+    wake()
   })
 
-  // The lower plates spread apart as the hero scrolls away.
+  // The lower plates spread apart as the hero scrolls away (and only matter while it shows).
   const onScroll = () => {
+    if (!visible) return
     const r = root.getBoundingClientRect()
     scrolled = clamp(-r.top / r.height)
+    wake()
   }
   window.addEventListener('scroll', onScroll, { passive: true })
-  onScroll()
 
   // Follow the theme switch, and repaint at once so a view transition captures new colors.
   new MutationObserver(() => {
     pal = currentPalette()
+    backdropKey = ''
     draw()
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
 
@@ -865,13 +993,11 @@ export function mountCluster(root: HTMLElement) {
   resize()
 
   // Frames run while the canvas is on screen, once the cluster has started.
-  const run = () => {
-    if (ready && visible && !frame) frame = requestAnimationFrame(loop)
-  }
   new IntersectionObserver(([entry]) => {
     visible = entry!.isIntersecting
-    run()
+    onScroll()
   }).observe(canvas)
+  document.addEventListener('visibilitychange', wake)
 
   // Start once the fonts for the printed labels are ready, so nothing reflows mid-intro.
   void Promise.race([document.fonts.ready, new Promise((r) => later(600, () => r(null)))]).then(
@@ -879,7 +1005,7 @@ export function mountCluster(root: HTMLElement) {
       start = performance.now()
       now = start
       ready = true
-      run()
+      wake()
       if (!reduced) live()
     },
   )

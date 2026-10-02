@@ -97,6 +97,23 @@ anchoring (`overflow-anchor: none`), and rows that re-sort glide into place rath
 The demos only run while on screen, and not at all with reduced motion. `tests/e2e/layout.spec.ts`
 checks for sideways scrolling at eight widths, layout shifts and scroll drift.
 
+### Light on resources
+
+The page should cost a visitor next to nothing while it's open:
+
+- The hero draws only as often as it must: every frame for its intro and while it follows the
+  pointer, 30 a second while pods come and go, 20 while only glows pulse. Its plates are
+  painted once into a backdrop and copied each frame. With reduced motion, it draws only when
+  something changes.
+- Off screen, or in a hidden tab, nothing runs: not the hero, not its cluster's life, not the
+  demos' timers.
+- Animations move things with `transform` and `opacity`, so the browser never lays the page out
+  for them.
+- The screenshots of the app's other views download once its window is on screen.
+
+`tests/e2e/resources.spec.ts` counts the hero's frames and checks what runs where nobody's
+looking.
+
 ## Where things are
 
 ```

@@ -1,6 +1,6 @@
 /**
  * "⌘K goes anywhere": the app's command palette over the demo cluster. It types searches on
- * its own until someone clicks into it; then it's theirs to search.
+ * its own while it's on screen, until someone clicks into it; then it's theirs to search.
  */
 import { DEMO_CLUSTER, OTHER_CLUSTERS } from '../../lib/demo-cluster'
 import { escapeHtml } from '../../lib/html'
@@ -129,6 +129,7 @@ export function mountCommand(root: HTMLElement) {
 
   // Typing on its own: a search, a couple of moves down the results, then the next one.
   let playing = !reducedMotion
+  let onScreen = false
   let timer = 0
   const after = (ms: number, fn: () => void) => (timer = window.setTimeout(fn, ms))
 
@@ -187,14 +188,19 @@ export function mountCommand(root: HTMLElement) {
     render()
   })
 
+  // It types while it's on screen and the tab shows; out of sight, it waits, and starts the
+  // next search when it's back.
+  const resume = () => {
+    window.clearTimeout(timer)
+    if (playing && onScreen && !document.hidden) play()
+  }
+  new IntersectionObserver(([entry]) => {
+    onScreen = entry!.isIntersecting
+    resume()
+  }).observe(root)
+  document.addEventListener('visibilitychange', resume)
+
   render()
-  // It starts typing the first time it comes into view.
-  const observer = new IntersectionObserver(([entry]) => {
-    if (!entry!.isIntersecting || !playing) return
-    observer.disconnect()
-    play()
-  })
-  observer.observe(root)
 }
 
 document.querySelectorAll<HTMLElement>('[data-command]').forEach(mountCommand)

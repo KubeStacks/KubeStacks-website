@@ -286,8 +286,6 @@ const dl = await latestAtBuild()
     padding: 10px 12px;
     border-radius: 10px;
     background: var(--popover);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--shadow-pop);
     pointer-events: none;
     font-size: 12px;
@@ -362,9 +360,9 @@ const dl = await latestAtBuild()
     width: 296px;
     padding: 14px 16px 12px;
     border-radius: 12px;
+    /* No backdrop blur here or on the tooltip: over the canvas, it would be redone with every
+       frame, and at these opacities it shows nothing. */
     background: var(--glass);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid var(--line);
     box-shadow: var(--shadow-panel);
     animation: rise 800ms var(--ease-out) 1.6s both;
@@ -428,13 +426,15 @@ const dl = await latestAtBuild()
     display: flex;
     gap: 3px;
     height: 8px;
+    /* Its segments' growth lays out and repaints the bar alone. */
+    contain: strict;
   }
 
   .bar i {
     flex: 0 1 0;
     min-width: 0;
     border-radius: 99px;
-    transition: flex-grow 500ms var(--ease-out);
+    transform-origin: left;
   }
 
   .bar i[data-empty='true'] {

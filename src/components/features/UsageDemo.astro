@@ -37,7 +37,7 @@ import { icon } from '../../lib/icons'
           d=""
         ></path>
       </svg>
-      <span class="end" data-u-end></span>
+      <span class="end" data-u-end style="--y: 22.9px"></span>
       <small>Last hour</small>
     </div>
   </div>
@@ -49,7 +49,9 @@ import { icon } from '../../lib/icons'
     aria-valuemax="100"
     aria-valuenow="44"
   >
-    <i data-u-fill style="width: 44%"></i>
+    <span class="fill">
+      <i data-u-fill style="--v: 0.444"></i>
+    </span>
     <b title="Requests: 25%" style="left: 25%"></b>
   </div>
   <dl>
@@ -145,16 +147,18 @@ import { icon } from '../../lib/icons'
     color: var(--text-3);
   }
 
+  /* The line's end, at height --y; it moves on the compositor, without layout. */
   .end {
     position: absolute;
+    top: 0;
     left: 100%;
     width: 9px;
     height: 9px;
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 0 3px var(--surface-2);
-    transform: translate(-50%, -50%);
-    transition: top 600ms var(--ease-out);
+    transform: translate(-50%, calc(var(--y) - 50%));
+    transition: transform 600ms var(--ease-out);
   }
 
   .meter {
@@ -164,12 +168,22 @@ import { icon } from '../../lib/icons'
     background: var(--accent-track);
   }
 
+  /* The fill, at --v of the track: a full-width bar slid in from the left, so it moves on the
+     compositor, without layout. The track clips it to its rounded shape. */
+  .meter .fill {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
   .meter i {
     display: block;
     height: 100%;
     border-radius: inherit;
     background: var(--accent);
-    transition: width 600ms var(--ease-out);
+    transform: translateX(calc((var(--v) - 1) * 100%));
+    transition: transform 600ms var(--ease-out);
   }
 
   .meter b {

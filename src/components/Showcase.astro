@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets'
+import { getImage } from 'astro:assets'
 import overview from '../assets/screenshots/overview-dark.png'
 import overviewLight from '../assets/screenshots/overview-light.png'
 import workloads from '../assets/screenshots/workloads-dark.png'
@@ -83,6 +83,28 @@ const views = [
     caption: 'Releases, their values and every revision, with a diff between any two.',
   },
 ]
+
+const WIDTHS = [960, 1440, 2000, 2880]
+const SIZES = '(max-width: 1320px) 100vw, 1240px'
+
+// Each view's screenshot in both themes. Only the first view's load with the page; the
+// others' sources wait in data attributes until the window is on screen (scripts/showcase.ts),
+// so visitors who never scroll this far don't download them.
+const shots = await Promise.all(
+  views.map((v) =>
+    Promise.all(
+      (
+        [
+          ['dark', v.img],
+          ['light', v.imgLight],
+        ] as const
+      ).map(async ([variant, src]) => ({
+        variant,
+        image: await getImage({ src, widths: WIDTHS, sizes: SIZES }),
+      })),
+    ),
+  ),
+)
 ---
 
 <section class="showcase" id="app" data-showcase>
@@ -133,18 +155,17 @@ const views = [
             aria-labelledby={`tab-${v.id}`}
             data-active={i === 0 ? 'true' : 'false'}
           >
-            {(
-              [
-                ['dark', v.img],
-                ['light', v.imgLight],
-              ] as const
-            ).map(([variant, img]) => (
-              <Image
-                src={img}
+            {shots[i]!.map(({ variant, image }) => (
+              <img
+                {...(i === 0
+                  ? { src: image.src, srcset: image.srcSet.attribute }
+                  : { 'data-src': image.src, 'data-srcset': image.srcSet.attribute })}
+                sizes={SIZES}
+                width={image.attributes.width}
+                height={image.attributes.height}
                 alt={v.alt}
-                widths={[960, 1440, 2000, 2880]}
-                sizes="(max-width: 1320px) 100vw, 1240px"
                 loading="lazy"
+                decoding="async"
                 draggable="false"
                 data-variant={variant}
               />

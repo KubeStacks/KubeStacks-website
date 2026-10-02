@@ -18,7 +18,9 @@ const chips = [
       </span>
     ))}
   </div>
-  <ol aria-label="Log lines from the checkout deployment"></ol>
+  <div class="lines">
+    <ol aria-label="Log lines from the checkout deployment"></ol>
+  </div>
 </div>
 
 <style>
@@ -62,18 +64,23 @@ const chips = [
     font-variant-numeric: tabular-nums;
   }
 
-  ol {
+  /* The lines sit at the bottom, and the oldest fade out at the top. */
+  .lines {
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    margin: 0;
     padding: 6px 0;
-    list-style: none;
     overflow: hidden;
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%);
     mask-image: linear-gradient(to bottom, transparent, #000 30%);
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   ol :global(li) {

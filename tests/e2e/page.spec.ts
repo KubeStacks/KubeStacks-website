@@ -108,21 +108,47 @@ test.describe('the app window', () => {
     await expect(showcase).toBeInViewport({ ratio: 0.5 })
   })
 
-  test('screenshots load up front, in the current theme', async ({ page }) => {
+  test('screenshots load once the window is on screen, in the current theme', async ({ page }) => {
+    const requested: string[] = []
+    page.on('request', (r) => r.url().includes('.webp') && requested.push(r.url()))
     await page.emulateMedia({ colorScheme: 'dark' })
     await page.goto('/')
+    await page.waitForLoadState('networkidle')
+    // Only the open view has its sources; the others wait.
+    expect(await eager(page)).toEqual([])
+    expect(requested.every((u) => u.includes('/overview-'))).toBe(true)
+    await expect(page.locator('[data-showcase] img[data-src]')).toHaveCount(12)
+    // Switching themes from up here loads nothing either.
+    await page.emulateMedia({ colorScheme: 'light' })
+    await page.emulateMedia({ colorScheme: 'dark' })
+    expect(await eager(page)).toEqual([])
+
+    await page.locator('[data-showcase] .window').scrollIntoViewIfNeeded()
+    await expect.poll(() => eager(page).then((e) => e.length)).toBe(8)
     const loaded = await eager(page)
     expect(loaded.filter((e) => e.endsWith('-dark'))).toHaveLength(7)
     // The open view, ready in the other theme.
-    expect(loaded).toEqual(expect.arrayContaining(['overview-light']))
-    expect(loaded).toHaveLength(8)
+    expect(loaded).toContain('overview-light')
+    await expect(page.locator('[data-showcase] img[data-variant="dark"][data-src]')).toHaveCount(0)
 
     await page.emulateMedia({ colorScheme: 'light' })
     await expect
       .poll(() => eager(page).then((e) => e.filter((x) => x.endsWith('-light')).length))
       .toBe(7)
+    await expect(page.locator('[data-showcase] img[data-src]')).toHaveCount(0)
     await tab(page, 'logs').click()
     expect(await eager(page)).toContain('logs-dark')
+  })
+
+  test('picking a view from afar loads them too', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'keyboard')
+    await page.goto('/')
+    await page.keyboard.press('g')
+    await page.keyboard.press('h')
+    await expect(
+      page.locator('[data-showcase] .view[data-view="helm"] img:visible'),
+    ).toHaveJSProperty('complete', true)
+    expect((await eager(page)).length).toBeGreaterThanOrEqual(8)
   })
 })
 
