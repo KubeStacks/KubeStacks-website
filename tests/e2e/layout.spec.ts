@@ -43,6 +43,10 @@ test.describe('layout', () => {
 
   test('the page doesn’t shift as it loads', async ({ page, browserName }) => {
     test.skip(browserName !== 'chromium', 'layout-shift entries are Chromium’s')
+    // On a slow computer, as on a CI runner: fonts and the visitor's download arrive after the
+    // first paint there, and must not move anything.
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
     await page.addInitScript(() => {
       ;(window as { shift?: number }).shift = 0
       new PerformanceObserver((list) => {
@@ -58,7 +62,7 @@ test.describe('layout', () => {
       await page.evaluate((top) => scrollTo(0, top), y)
       await page.waitForTimeout(120)
     }
-    expect(await page.evaluate(() => (window as { shift?: number }).shift)).toBeLessThan(0.01)
+    expect(await page.evaluate(() => (window as { shift?: number }).shift)).toBeLessThan(0.001)
   })
 
   test('the demos don’t move the page while they run', async ({ page }) => {

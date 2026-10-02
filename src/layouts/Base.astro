@@ -1,5 +1,9 @@
 ---
 import '../styles/global.css'
+// The Latin files of the two fonts, preloaded: otherwise browsers fetch a font only once
+// layout needs it, after the first paint, and the text shifts when it swaps in.
+import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url'
+import monoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url'
 
 interface Props {
   title: string
@@ -40,6 +44,8 @@ const ogImage = new URL('/og.png', Astro.site)
         }
       })()
     </script>
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

@@ -212,6 +212,19 @@ const dl = await latestAtBuild()
     color: var(--text-3);
   }
 
+  /* On a computer (one with a mouse), the line is there from the start, so nothing moves when
+     it fills in with the visitor's download. Phones and tablets never get one. */
+  @media (pointer: fine) {
+    .dl-note {
+      min-height: 1lh;
+    }
+
+    .dl-note[hidden] {
+      display: block !important;
+      visibility: hidden;
+    }
+  }
+
   .dl-note :global(a) {
     color: var(--text-2);
     text-underline-offset: 3px;
