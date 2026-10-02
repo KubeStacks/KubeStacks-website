@@ -82,6 +82,16 @@ AppImage, and the download section lists the rest. Files are matched by the name
 [`src/lib/releases.ts`](src/lib/releases.ts)); if those names change, change the patterns
 there too.
 
+### Screenshots
+
+The app's screenshots aren't kept here. They load from the app's repository
+([`docs/screenshots`](https://github.com/KubeStacks/KubeStacks/tree/main/docs/screenshots)),
+through jsDelivr, at 1440 × 900 and twice that: the app's `npm run screenshots` takes every
+screen again and jsDelivr's copies are refreshed, so the site shows the app as it is now
+without a redeploy. Each is picked by its name there (see
+[`src/lib/screenshots.ts`](src/lib/screenshots.ts)), and names never change. The tests answer
+every screenshot with one small stand-in, `tests/fixtures/screenshot.webp`.
+
 ### Light and dark
 
 The page follows the system's theme, or the one picked in the switch at the top (System,
@@ -137,21 +147,18 @@ src/
   lib/                    Shared by the build and the page
     releases.ts             The latest release and which file each platform gets
     icons.ts                Lucide icons (the app's set) as SVG strings, and the status pill
+    screenshots.ts          The app's screenshots, from its repository
     site.ts                 Links to the repository, author and Sevalla
   styles/global.css       The app's tokens, type scale and shared pieces
-  assets/screenshots/     The app's screenshots, dark and light
 tests/
   e2e/                    Playwright specs, by section
-  support/, fixtures/     The GitHub stand-in, a release, the cluster's geometry
+  support/, fixtures/     The GitHub stand-in, a release, a screenshot, the cluster's geometry
 scripts/                  The coverage build and gate
 ```
 
 The design follows the app: its tokens, Inter and JetBrains Mono, Lucide icons, the status
 pill and colors, and the same demo cluster (`checkout-jzhdh6j29h-hqnnn` crash-loops here
-too). The screenshots come from the app's own script, which captures every view in both
-themes: run `npm run build && node scripts/screenshots.ts <folder>` in the app's repository
-and copy the `overview`, `workloads`, `bulk`, `metrics`, `logs`, `shell` and `helm` pairs into
-`src/assets/screenshots`.
+too), with its screenshots taken from its repository (see [Screenshots](#screenshots)).
 
 ## Deploying
 
