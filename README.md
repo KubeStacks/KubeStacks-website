@@ -142,6 +142,11 @@ is hosted on [Sevalla](https://sevalla.com) as a static site, with `npm run buil
 build command and `dist` as the publish directory. `site` in
 [`astro.config.ts`](astro.config.ts) builds the canonical and social-preview links.
 
+## Contributing
+
+Fixes and improvements are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Problems with
+the app itself go to [its repository](https://github.com/KubeStacks/KubeStacks/issues).
+
 ## Credits
 
 - [Lucide](https://lucide.dev) icons (ISC License)

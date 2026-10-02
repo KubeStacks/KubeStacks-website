@@ -1,0 +1,28 @@
+name: Something's off on the website
+description: A broken link, a layout glitch, a demo that misbehaves, a typo
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Where on the page, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Safari 26 on an iPhone 15, Chrome 150 on Windows 11 …
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options: [Dark, Light, Not sure]
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot or recording
+      description: Drop it here; it helps a lot with layout issues.
