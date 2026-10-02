@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "1.0.0",
-  "description": "The website for KubeStacks, a Kubernetes app for the desktop: kubestacks.com",
+  "description": "The website for KubeStacks, a Kubernetes app for the desktop and the cluster: kubestacks.com",
   "homepage": "https://kubestacks.com",
   "repository": {
     "type": "git",

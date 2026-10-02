@@ -109,7 +109,9 @@ test.describe('the hero', () => {
     await page.clock.runFor(1000)
     expect(await framesOver(page, 5000)).toBe(0)
 
-    // Pointing at a failing pod draws it raised; moving on it draws nothing more.
+    // Pointing at a failing pod draws it raised; moving on it draws nothing more. (On a phone,
+    // the pod is below the fold until the cluster is scrolled to.)
+    await page.locator('[data-cluster] canvas').scrollIntoViewIfNeeded()
     const pod = await podAt(page, 'db-migrate-2r5n5')
     await page.mouse.move(pod.x, pod.y)
     expect(await framesOver(page, 500)).toBeGreaterThan(0)

@@ -14,8 +14,9 @@ import { site } from '../lib/site'
     <nav aria-label="Sections" class="links">
       <a href="#app">The app</a>
       <a href="#features">Features</a>
+      <a href="#cluster">In your cluster</a>
       <a href="#story">Story</a>
-      <a href="#download">Download</a>
+      <a href="#download">Install</a>
     </nav>
     <ThemeSwitch />
     <a class="gh" href={site.repo} target="_blank" rel="noopener">
@@ -74,6 +75,7 @@ import { site } from '../lib/site'
     font-size: 0.875rem;
     color: var(--text-2);
     text-decoration: none;
+    white-space: nowrap;
     transition:
       color 150ms ease,
       background-color 150ms ease;
@@ -93,7 +95,7 @@ import { site } from '../lib/site'
     box-shadow: inset 0 0 0 1px var(--line-strong);
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 900px) {
     .links {
       display: none;
     }

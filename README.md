@@ -4,7 +4,8 @@
 
 # kubestacks.com
 
-The website for [KubeStacks](https://github.com/KubeStacks/KubeStacks), a Kubernetes app for the desktop.
+The website for [KubeStacks](https://github.com/KubeStacks/KubeStacks), a Kubernetes app for the desktop,
+and a dashboard served from the cluster for the whole team.
 
 [![CI](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml)
 [![E2E coverage](https://img.shields.io/badge/e2e%20coverage-100%25-3fb950)](#testing)
@@ -119,7 +120,8 @@ The page should cost a visitor next to nothing while it's open:
   demos' timers.
 - Animations move things with `transform` and `opacity`, so the browser never lays the page out
   for them.
-- The screenshots of the app's other views download once its window is on screen.
+- The screenshots of the app's other views download once its window is on screen, and the
+  in-cluster one once it's near.
 
 `tests/e2e/resources.spec.ts` counts the hero's frames and checks what runs where nobody's
 looking.
@@ -134,10 +136,11 @@ src/
     Hero.astro              Headline and the live cluster
     Showcase.astro          The app window with real screenshots (G, then a letter)
     Features.astro          Six tiles, each with a working piece of the UI (features/)
+    Cluster.astro           KubeStacks served from a cluster, and how people sign in
     More.astro              Custom resources and views, and the smaller features
     Themes.astro            Light and dark, side by side
     Story.astro             Why KubeStacks exists, and Sevalla
-    Download.astro          Platforms, building from source, requirements
+    Download.astro          Platforms, building from source, requirements; the chart and image
     logos/                  KubeStacks, GitHub and Sevalla marks
   scripts/                Each section's behavior, mounted on its data-* attribute
     cluster/                The hero: data, geometry, palettes and the renderer
@@ -148,7 +151,7 @@ src/
     releases.ts             The latest release and which file each platform gets
     icons.ts                Lucide icons (the app's set) as SVG strings, and the status pill
     screenshots.ts          The app's screenshots, from its repository
-    site.ts                 Links to the repository, author and Sevalla
+    site.ts                 Links to the repository, author and Sevalla; the chart and image
   styles/global.css       The app's tokens, type scale and shared pieces
 tests/
   e2e/                    Playwright specs, by section

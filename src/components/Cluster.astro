@@ -1,0 +1,455 @@
+---
+import { icon, type IconName } from '../lib/icons'
+import { VARIANTS, screenshot } from '../lib/screenshots'
+import { site } from '../lib/site'
+
+// The chart's auth.mode, and what each means for who KubeStacks acts as (docs/server.md).
+const modes: { icon: IconName; title: string; mode: string; text: string }[] = [
+  {
+    icon: 'key-round',
+    title: 'With a token',
+    mode: 'token',
+    text: 'People paste a token the cluster accepts, a service account’s or one from your identity provider, and the cluster checks each request made with it. KubeStacks’ own service account needs no permissions.',
+  },
+  {
+    icon: 'log-in',
+    title: 'With single sign-on',
+    mode: 'oidc',
+    text: 'Dex, Keycloak, Okta, Entra ID, Google or GitLab. KubeStacks acts as whoever signs in, or passes their own token on when the API server already trusts the provider.',
+  },
+  {
+    icon: 'shield-check',
+    title: 'Behind a proxy',
+    mode: 'proxy',
+    text: 'oauth2-proxy or Pomerium signs people in and names them in a header. The chart’s network policy keeps out everything but the proxy.',
+  },
+]
+
+const notes: { icon: IconName; html: string }[] = [
+  {
+    icon: 'link',
+    html: 'Every page has an address. Send someone the pod, its logs or the release you’re looking at.',
+  },
+  {
+    icon: 'lock',
+    html: 'Never more than each person’s own RBAC, and <code>readOnly: true</code> keeps everyone from changing anything.',
+  },
+  {
+    icon: 'container',
+    html: 'A small image for amd64 and arm64 that runs as non-root, has no shell and writes only to <code>/tmp</code>.',
+  },
+]
+---
+
+<section class="cluster" id="cluster">
+  <div class="wrap">
+    <div class="head">
+      <div class="intro">
+        <span class="eyebrow">In your cluster</span>
+        <h2 class="h2">
+          The same app, <span class="dim">for your whole team.</span>
+        </h2>
+      </div>
+      <p class="lead">
+        Install the Helm chart and KubeStacks runs in the cluster, as a dashboard your team opens in
+        a browser. Nobody installs anything, and everyone sees and changes what their own
+        permissions allow.
+      </p>
+    </div>
+
+    <div class="body">
+      <div class="shot">
+        <figure class="browser">
+          <div class="bar" aria-hidden="true">
+            <span class="dots">
+              <i></i>
+              <i></i>
+              <i></i>
+            </span>
+            <span class="address">
+              <Fragment set:html={icon('lock')} />
+              <span>
+                kubestacks.example.com<span class="path">/cluster/production</span>
+              </span>
+            </span>
+          </div>
+          <div class="page">
+            {VARIANTS.map((variant) => (
+              <img
+                {...screenshot('server-account', variant)}
+                sizes="(max-width: 960px) 100vw, 720px"
+                alt="KubeStacks in a browser, showing the production cluster’s overview, with the menu of who’s signed in open: jane@example.com, in the platform and on-call groups."
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+                data-variant={variant}
+              />
+            ))}
+          </div>
+        </figure>
+
+        <!-- The menu of who's signed in, as the screenshot has it, at a size that can be read. -->
+        <div class="who" aria-hidden="true">
+          <span class="who-label">Signed in as</span>
+          <span class="who-name">jane@example.com</span>
+          <span class="who-groups">
+            <code>platform</code>
+            <code>on-call</code>
+          </span>
+          <span class="who-note">Signed in by the proxy in front of KubeStacks.</span>
+        </div>
+      </div>
+
+      <div class="side">
+        <p class="side-title">How people sign in</p>
+        <ul class="modes">
+          {modes.map((m) => (
+            <li>
+              <span class="ic" set:html={icon(m.icon)} />
+              <div class="m-head">
+                <h3>{m.title}</h3>
+                <code>auth.mode: {m.mode}</code>
+              </div>
+              <p>{m.text}</p>
+            </li>
+          ))}
+        </ul>
+        <div class="ctas">
+          <a class="btn btn-primary" href="#install-cluster">
+            <Fragment set:html={icon('ship-wheel')} />
+            Install the chart
+          </a>
+          <a class="btn btn-secondary" href={site.serverDocs} target="_blank" rel="noopener">
+            Read the docs
+            <Fragment set:html={icon('arrow-up-right')} />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      {notes.map((n) => (
+        <li>
+          <span class="ic" set:html={icon(n.icon)} />
+          <p set:html={n.html} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cluster {
+    padding-block: clamp(64px, 9vw, 120px);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: 2rem 4rem;
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+
+  .intro {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .head .lead {
+    font-size: 1.0625rem;
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(32px, 4vw, 56px);
+    align-items: start;
+  }
+
+  .shot {
+    position: relative;
+  }
+
+  /* A browser, where the showcase above is the desktop app's window. */
+  .browser {
+    position: relative;
+    margin: 0;
+    border-radius: clamp(10px, 1.2vw, 14px);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shadow-window);
+  }
+
+  .browser::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--window-edge);
+    pointer-events: none;
+  }
+
+  .bar {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding-inline: 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--line-strong);
+  }
+
+  .address {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    justify-self: center;
+    width: min(100%, 360px);
+    height: 26px;
+    padding-inline: 10px;
+    border-radius: 7px;
+    background: var(--tint-strong);
+    font-size: 12px;
+    color: var(--text-1);
+  }
+
+  .address :global(svg) {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--text-3);
+  }
+
+  .address > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .path {
+    color: var(--text-3);
+  }
+
+  .page {
+    aspect-ratio: 1440 / 900;
+  }
+
+  .page :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+  }
+
+  /* A screenshot per theme; only the current theme's shows, or loads. */
+  :global(:root[data-theme='light']) .page :global(img[data-variant='dark']),
+  :global(:root:not([data-theme='light'])) .page :global(img[data-variant='light']) {
+    display: none;
+  }
+
+  .who {
+    position: absolute;
+    left: calc(-1 * min(24px, var(--gutter) / 2));
+    bottom: -28px;
+    display: grid;
+    justify-items: start;
+    gap: 6px;
+    width: 264px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--popover);
+    box-shadow: var(--shadow-pop);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .who {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 40%;
+      }
+    }
+  }
+
+  .who-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .who-name {
+    font-weight: 500;
+    color: var(--text-1);
+  }
+
+  .who-groups {
+    display: flex;
+    gap: 6px;
+  }
+
+  .who-groups code {
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: var(--surface-3);
+    font-size: 11px;
+    color: var(--text-2);
+  }
+
+  .who-note {
+    justify-self: stretch;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .side {
+    display: grid;
+    gap: 16px;
+  }
+
+  .side-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-3);
+  }
+
+  .modes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .modes li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 6px 14px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .modes li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ic {
+    grid-row: span 2;
+    padding-top: 2px;
+    color: var(--accent-strong);
+  }
+
+  .ic :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+
+  .m-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+
+  .m-head h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .m-head code {
+    font-size: 11.5px;
+    color: var(--text-3);
+  }
+
+  .notes code {
+    font-size: 0.875em;
+    color: var(--text-1);
+  }
+
+  .modes p,
+  .notes p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 8px;
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px clamp(24px, 3vw, 40px);
+    margin: clamp(32px, 4vw, 48px) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .notes li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .notes .ic {
+    grid-row: auto;
+  }
+
+  @media (max-width: 960px) {
+    .head,
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .who {
+      left: 16px;
+      bottom: 16px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .who {
+      display: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .notes {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .bar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .dots {
+      display: none;
+    }
+  }
+</style>
