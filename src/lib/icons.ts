@@ -13,14 +13,17 @@ import CircleCheck from 'lucide-static/icons/circle-check.svg?raw'
 import CircleDashed from 'lucide-static/icons/circle-dashed.svg?raw'
 import CircleMinus from 'lucide-static/icons/circle-minus.svg?raw'
 import CircleX from 'lucide-static/icons/circle-x.svg?raw'
+import Container from 'lucide-static/icons/container.svg?raw'
 import Copy from 'lucide-static/icons/copy.svg?raw'
 import Download from 'lucide-static/icons/download.svg?raw'
 import Gauge from 'lucide-static/icons/gauge.svg?raw'
 import KeyRound from 'lucide-static/icons/key-round.svg?raw'
 import Layers from 'lucide-static/icons/layers.svg?raw'
 import LayoutGrid from 'lucide-static/icons/layout-grid.svg?raw'
+import Link from 'lucide-static/icons/link.svg?raw'
 import ListChecks from 'lucide-static/icons/list-checks.svg?raw'
 import Lock from 'lucide-static/icons/lock.svg?raw'
+import LogIn from 'lucide-static/icons/log-in.svg?raw'
 import Minus from 'lucide-static/icons/minus.svg?raw'
 import Monitor from 'lucide-static/icons/monitor.svg?raw'
 import Moon from 'lucide-static/icons/moon.svg?raw'
@@ -48,14 +51,17 @@ const ICONS = {
   'circle-dashed': CircleDashed,
   'circle-minus': CircleMinus,
   'circle-x': CircleX,
+  container: Container,
   copy: Copy,
   download: Download,
   gauge: Gauge,
   'key-round': KeyRound,
   layers: Layers,
   'layout-grid': LayoutGrid,
+  link: Link,
   'list-checks': ListChecks,
   lock: Lock,
+  'log-in': LogIn,
   minus: Minus,
   monitor: Monitor,
   moon: Moon,

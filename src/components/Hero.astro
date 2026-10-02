@@ -1,7 +1,5 @@
 ---
-import GithubMark from './logos/GithubMark.astro'
 import { icon } from '../lib/icons'
-import { site } from '../lib/site'
 import { latestAtBuild } from '../lib/latest-release'
 import { releaseHeadline, releasePage, versionTag } from '../lib/releases'
 
@@ -29,8 +27,9 @@ const dl = await latestAtBuild()
       </h1>
 
       <p class="lead">
-        KubeStacks is a fast desktop app for Kubernetes. It shows what’s healthy, what’s struggling
-        and where your capacity goes, across every cluster in your kubeconfig.
+        KubeStacks is a fast app for Kubernetes. It shows what’s healthy, what’s struggling and
+        where your capacity goes: on your desktop for every cluster in your kubeconfig, or in your
+        cluster for the whole team.
       </p>
 
       <div class="get">
@@ -42,9 +41,9 @@ const dl = await latestAtBuild()
               {versionTag(dl)}
             </span>
           </a>
-          <a class="btn btn-secondary" href={site.repo} target="_blank" rel="noopener">
-            <GithubMark size={17} />
-            Star on GitHub
+          <a class="btn btn-secondary" href="#cluster">
+            <Fragment set:html={icon('ship-wheel')} />
+            Run it in your cluster
           </a>
         </div>
         <p class="dl-note" data-hero-note hidden></p>
@@ -53,7 +52,8 @@ const dl = await latestAtBuild()
       <ul class="facts">
         <li>Free and open source</li>
         <li>macOS, Windows and Linux</li>
-        <li>No telemetry, no accounts</li>
+        <li>Helm chart for any cluster</li>
+        <li>No telemetry</li>
       </ul>
     </div>
 

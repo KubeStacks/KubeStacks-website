@@ -1,8 +1,11 @@
 ---
-import { Image } from 'astro:assets'
-import dark from '../assets/screenshots/overview-dark.png'
-import light from '../assets/screenshots/overview-light.png'
 import { icon } from '../lib/icons'
+import { screenshot } from '../lib/screenshots'
+
+// The overview from the app's repository (lib/screenshots.ts), in both themes.
+const light = screenshot('overview', 'light')
+const dark = screenshot('overview', 'dark')
+const sizes = '(max-width: 1320px) 100vw, 1240px'
 ---
 
 <section class="themes">
@@ -18,22 +21,22 @@ import { icon } from '../lib/icons'
     </div>
 
     <div class="compare" data-compare style="--split: 50%">
-      <Image
-        src={light}
+      <img
+        {...light}
+        {sizes}
         alt="The overview in the light theme."
-        widths={[960, 1440, 2000, 2880]}
-        sizes="(max-width: 1320px) 100vw, 1240px"
         loading="lazy"
+        decoding="async"
         class="img light"
         draggable="false"
       />
       <div class="dark-clip">
-        <Image
-          src={dark}
+        <img
+          {...dark}
+          {sizes}
           alt="The same overview in the dark theme."
-          widths={[960, 1440, 2000, 2880]}
-          sizes="(max-width: 1320px) 100vw, 1240px"
           loading="lazy"
+          decoding="async"
           class="img"
           draggable="false"
         />

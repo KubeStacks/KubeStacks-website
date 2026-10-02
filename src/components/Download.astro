@@ -2,7 +2,8 @@
 import KubeStacksLogo from './logos/KubeStacksLogo.astro'
 import GithubMark from './logos/GithubMark.astro'
 import { icon } from '../lib/icons'
-import { site } from '../lib/site'
+import { escapeHtml } from '../lib/html'
+import { server, site } from '../lib/site'
 import { latestAtBuild } from '../lib/latest-release'
 import { LATEST_URL, fileSize, fileUrl, releaseDay, releasePage, versionTag } from '../lib/releases'
 
@@ -17,6 +18,26 @@ const linux = [
 
 const build =
   'git clone https://github.com/KubeStacks/KubeStacks && cd KubeStacks && npm ci && npm run dist'
+
+// As docs/server.md in the app has them. The chart and the image are released with the app,
+// under its version, so these always get the latest.
+const helm = `helm install kubestacks ${server.chart} \\
+  --namespace kubestacks --create-namespace
+kubectl port-forward --namespace kubestacks service/kubestacks 8080:80`
+
+/**
+ * A command a line at a time, so a line too long for its box wraps under itself, indented,
+ * rather than under the next. Copying it gives the lines as they are.
+ */
+const lines = (command: string) =>
+  command
+    .split('\n')
+    .map((line, i, all) => `<span>${escapeHtml(line)}${i < all.length - 1 ? '\n' : ''}</span>`)
+    .join('')
+
+const docker = `docker run --rm -p 8080:8080 \\
+  -v "$PWD/kubeconfig:/kubeconfig:ro" -e KUBECONFIG=/kubeconfig \\
+  ${server.image}`
 ---
 
 <section class="download" id="download">
@@ -26,8 +47,8 @@ const build =
       <KubeStacksLogo size={64} class="mark" />
       <h2 class="h2">Get KubeStacks.</h2>
       <p class="lead">
-        Free and open source under the Apache 2.0 license. No telemetry, no accounts. It talks to
-        the clusters in your kubeconfig and nothing else.
+        Free and open source under the Apache 2.0 license, with no telemetry. Download it for your
+        computer, or install it in your cluster for everyone on your team.
       </p>
       <p class="status" data-dl-status hidden={!dl}>
         <span
@@ -55,10 +76,15 @@ const build =
       </p>
     </div>
 
+    <div class="track">
+      <h3>On your computer</h3>
+      <span class="t-note">macOS, Windows and Linux</span>
+    </div>
+
     <ul class="platforms">
       <li data-platform="mac">
         <div class="p-head">
-          <h3>macOS</h3>
+          <h4>macOS</h4>
           <span class="p-yours">Your system</span>
         </div>
         <p class="p-info">macOS 12 or later. Signed and notarized by Apple.</p>
@@ -103,7 +129,7 @@ const build =
 
       <li data-platform="windows">
         <div class="p-head">
-          <h3>Windows</h3>
+          <h4>Windows</h4>
           <span class="p-yours">Your system</span>
         </div>
         <p class="p-info">Windows 10 or later, on x64 and arm64.</p>
@@ -128,7 +154,7 @@ const build =
 
       <li data-platform="linux">
         <div class="p-head">
-          <h3>Linux</h3>
+          <h4>Linux</h4>
           <span class="p-yours">Your system</span>
         </div>
         <p class="p-info">A recent 64-bit distribution.</p>
@@ -201,6 +227,68 @@ const build =
         </div>
       </dl>
     </div>
+
+    <div class="track" id="install-cluster">
+      <h3>In your cluster</h3>
+      <span class="t-note">For the whole team, in a browser</span>
+    </div>
+
+    <ul class="servers">
+      <li>
+        <div class="p-head">
+          <h4>Helm chart</h4>
+          <span class="s-ic" set:html={icon('ship-wheel')} />
+        </div>
+        <p class="p-info">
+          Any cluster on Kubernetes 1.25 or later. Then open localhost:8080 and sign in with a
+          token.
+        </p>
+        <div class="cmd">
+          <pre id="helm-cmd" set:html={lines(helm)} />
+          <button
+            type="button"
+            class="copy"
+            data-copy="#helm-cmd"
+            aria-label="Copy the Helm commands"
+          >
+            <span class="i-copy" set:html={icon('copy')} />
+            <span class="i-done" set:html={icon('check')} />
+          </button>
+        </div>
+        <p class="p-more">
+          An ingress, single sign-on and every other setting are in{' '}
+          <a href={site.serverDocs} target="_blank" rel="noopener">
+            the docs
+          </a>
+          .
+        </p>
+      </li>
+
+      <li>
+        <div class="p-head">
+          <h4>Container image</h4>
+          <span class="s-ic" set:html={icon('container')} />
+        </div>
+        <p class="p-info">
+          Without Kubernetes, on a machine of its own: KubeStacks shows a cluster from a kubeconfig.
+        </p>
+        <div class="cmd">
+          <pre id="docker-cmd" set:html={lines(docker)} />
+          <button
+            type="button"
+            class="copy"
+            data-copy="#docker-cmd"
+            aria-label="Copy the Docker command"
+          >
+            <span class="i-copy" set:html={icon('copy')} />
+            <span class="i-done" set:html={icon('check')} />
+          </button>
+        </div>
+        <p class="p-more">
+          For linux/amd64 and arm64. Each release is signed with a build provenance attestation.
+        </p>
+      </li>
+    </ul>
 
     <div class="cta">
       <a class="btn btn-primary" href={site.repo} target="_blank" rel="noopener">
@@ -281,6 +369,42 @@ const build =
     text-decoration-color: currentColor;
   }
 
+  /* A label over each way to get KubeStacks, with a rule running to its note. */
+  .track {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .track::after {
+    content: '';
+    order: 1;
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .track h3 {
+    font-size: var(--step-label);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+
+  .t-note {
+    order: 2;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+
+  #install-cluster {
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
   .platforms {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -290,7 +414,8 @@ const build =
     list-style: none;
   }
 
-  .platforms > li {
+  .platforms > li,
+  .servers > li {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -314,7 +439,7 @@ const build =
     gap: 8px;
   }
 
-  .p-head h3 {
+  .p-head h4 {
     font-size: 1.25rem;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -435,6 +560,67 @@ const build =
     height: 14px;
   }
 
+  .servers {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Each way in a row of its own, so its command has the room to keep to its lines. */
+  .servers > li {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    grid-template-rows: auto auto 1fr;
+    gap: 10px 32px;
+  }
+
+  .servers .cmd {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+    margin-top: 0;
+  }
+
+  .s-ic {
+    color: var(--accent-strong);
+  }
+
+  .s-ic :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cmd {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 4px 4px 4px 14px;
+    border-radius: 10px;
+    background: var(--code-bg);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .cmd pre {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding-block: 7px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .cmd pre :global(span) {
+    display: block;
+    padding-left: 4ch;
+    text-indent: -4ch;
+  }
+
   .extra {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -546,14 +732,26 @@ const build =
 
   @media (max-width: 900px) {
     .platforms,
-    .extra {
+    .extra,
+    .servers > li {
       grid-template-columns: minmax(0, 1fr);
+    }
+    .servers > li {
+      grid-template-rows: none;
+    }
+    .servers .cmd {
+      grid-column: auto;
+      grid-row: auto;
+      margin-top: 6px;
     }
   }
 
   @media (max-width: 480px) {
     .reqs {
       grid-template-columns: minmax(0, 1fr);
+    }
+    .t-note {
+      display: none;
     }
   }
 </style>

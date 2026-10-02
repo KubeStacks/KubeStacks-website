@@ -5,6 +5,8 @@
  *   out the same way on every run.
  * - GitHub's API answers with the release the site was built with (see support/releases.ts
  *   for other answers): tests never reach the real one.
+ * - The app's screenshots, which the page loads from its repository through jsDelivr, are
+ *   all one small stand-in, so tests don't depend on (or wait for) the CDN.
  * - Coverage: when the test is done (and before any reload, with `save`), the page's
  *   counters are written to .nyc_output/ for the coverage report and the 100% gate.
  */
@@ -12,6 +14,7 @@ import { randomUUID } from 'node:crypto'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { test as base, expect, type Page } from '@playwright/test'
 import { BUILT, github } from '../support/releases'
+import { SCREENSHOTS } from '../../src/lib/screenshots'
 
 export const ONLINE = 'http://localhost:4400'
 export const OFFLINE = 'http://localhost:4401'
@@ -38,6 +41,9 @@ export async function save(page: Page) {
 export async function prepare(page: Page, seed = 1) {
   await page.addInitScript(seedRandom, seed)
   await github(page, BUILT)
+  await page.route(`${SCREENSHOTS}**`, (route) =>
+    route.fulfill({ path: new URL('../fixtures/screenshot.webp', import.meta.url).pathname }),
+  )
 }
 
 /**

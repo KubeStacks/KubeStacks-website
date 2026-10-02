@@ -1,4 +1,5 @@
 import { test, expect, prepare, save, ONLINE } from './fixtures'
+import { SCREENSHOTS } from '../../src/lib/screenshots'
 import type { Page } from '@playwright/test'
 
 const tab = (page: Page, view: string) =>
@@ -152,6 +153,44 @@ test.describe('the app window', () => {
   })
 })
 
+test.describe('in your cluster', () => {
+  test('the hero and the navigation lead to it, and it to the chart', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('.hero a[href="#cluster"]')).toHaveText('Run it in your cluster')
+    await expect(page.locator('[data-nav] a[href="#cluster"]')).toHaveText('In your cluster')
+    await expect(page.locator('#cluster a[href="#install-cluster"]')).toHaveText(
+      'Install the chart',
+    )
+    await expect(page.locator('#install-cluster')).toHaveCount(1)
+  })
+
+  test('shows the app served from a cluster, in the current theme, from the app’s repository', async ({
+    page,
+  }) => {
+    const requested: string[] = []
+    page.on('request', (r) => r.url().includes('/server-') && requested.push(r.url()))
+    await page.emulateMedia({ colorScheme: 'light' })
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+    // Far down the page, it waits until it's near.
+    expect(requested).toEqual([])
+
+    const shots = page.locator('#cluster .page img')
+    await page.locator('#cluster .browser').scrollIntoViewIfNeeded()
+    await expect(page.locator('#cluster .page img[data-variant="light"]')).toBeVisible()
+    await expect(page.locator('#cluster .page img[data-variant="dark"]')).toBeHidden()
+    await expect(page.locator('#cluster .page img:visible')).toHaveJSProperty('complete', true)
+    expect(requested.length).toBeGreaterThan(0)
+    expect(requested.every((url) => url.startsWith(`${SCREENSHOTS}server-account-light`))).toBe(
+      true,
+    )
+    expect(await shots.evaluateAll((imgs) => imgs.map((i) => i.getAttribute('src')))).toEqual([
+      `${SCREENSHOTS}server-account-dark-1x.webp`,
+      `${SCREENSHOTS}server-account-light-1x.webp`,
+    ])
+  })
+})
+
 test('the navigation gets its background once the page scrolls', async ({ page }) => {
   await page.goto('/')
   const nav = page.locator('[data-nav]')
@@ -175,8 +214,9 @@ test('the slider moves the line between the dark and light screenshots', async (
   expect(await split()).toBe('20%')
 })
 
-test.describe('the build commands', () => {
-  const button = (page: Page) => page.locator('button[data-copy="#build-cmd"]')
+test.describe('the commands', () => {
+  const button = (page: Page, target = '#build-cmd') =>
+    page.locator(`button[data-copy="${target}"]`)
 
   test('copy to the clipboard, and say so for a moment', async ({ page, context, browserName }) => {
     test.skip(browserName !== 'chromium', 'clipboard permissions are a Chromium thing')
@@ -198,6 +238,34 @@ test.describe('the build commands', () => {
     await page.clock.runFor(700)
     await expect(button(page)).not.toHaveAttribute('data-done')
     await expect(button(page)).toHaveAttribute('aria-label', 'Copy the build commands')
+  })
+
+  test('to run KubeStacks in a cluster copy as they’re written, line by line', async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'chromium', 'clipboard permissions are a Chromium thing')
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/')
+    const commands = {
+      '#helm-cmd': [
+        'helm install kubestacks oci://ghcr.io/kubestacks/charts/kubestacks \\',
+        '  --namespace kubestacks --create-namespace',
+        'kubectl port-forward --namespace kubestacks service/kubestacks 8080:80',
+      ],
+      '#docker-cmd': [
+        'docker run --rm -p 8080:8080 \\',
+        '  -v "$PWD/kubeconfig:/kubeconfig:ro" -e KUBECONFIG=/kubeconfig \\',
+        '  ghcr.io/kubestacks/kubestacks',
+      ],
+    }
+    for (const [target, lines] of Object.entries(commands)) {
+      await button(page, target).scrollIntoViewIfNeeded()
+      await button(page, target).click()
+      await expect(button(page, target)).toHaveAttribute('data-done')
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(lines.join('\n'))
+    }
   })
 
   test('are selected instead where the clipboard is refused', async ({ browser }) => {
