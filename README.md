@@ -6,6 +6,7 @@
 
 The website for [KubeStacks](https://github.com/KubeStacks/KubeStacks), a Kubernetes app for the desktop.
 
+[![CI](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml)
 [![E2E coverage](https://img.shields.io/badge/e2e%20coverage-100%25-3fb950)](#testing)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
@@ -37,13 +38,13 @@ npm run preview    # serves dist/
 | `npm run test:e2e`       | Builds the site with coverage, then runs the Playwright tests |
 | `npm run coverage`       | The tests, then the coverage report (`coverage/index.html`)   |
 | `npm run coverage:check` | Fails on anything uncovered, listing each line                |
-| `npm run verify`         | All of the above                                              |
+| `npm run verify`         | All of the above, as CI runs it                               |
 
 ## Testing
 
 The end-to-end tests in [`tests/e2e`](tests/e2e) drive the built site in desktop Chromium and
 in WebKit as an iPhone, the way visitors use it. They cover every script on the page, at
-**100% of statements, branches, functions and lines**.
+**100% of statements, branches, functions and lines**, enforced in CI.
 
 - **Real builds.** `npm run build:coverage` builds the site twice: as published, and as built
   while GitHub was down (so the browser has to find the release). Both talk to a stand-in for
