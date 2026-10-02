@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css'
-// The Latin files of the two fonts, preloaded: otherwise browsers fetch a font only once
-// layout needs it, after the first paint, and the text shifts when it swaps in.
+// The Latin files of the two fonts, preloaded below: otherwise browsers fetch a font only
+// once layout needs it, after the first paint, and the text shifts when it swaps in.
 import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url'
 import monoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url'
 
@@ -44,8 +44,22 @@ const ogImage = new URL('/og.png', Astro.site)
         }
       })()
     </script>
-    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={monoLatin} as="font" type="font/woff2" crossorigin />
+    <script is:inline define:vars={{ fonts: [interLatin, monoLatin] }}>
+      // A preload is used only if it's fetched the way the page later asks for the font, or the
+      // font downloads twice. WebKit asks for same-origin fonts without CORS; other engines
+      // always use CORS for fonts.
+      const ua = navigator.userAgent
+      const webkit = /AppleWebKit/.test(ua) && !/Chrome|Chromium/.test(ua)
+      for (const href of fonts) {
+        const link = document.createElement('link')
+        link.rel = 'preload'
+        link.as = 'font'
+        link.type = 'font/woff2'
+        link.href = href
+        if (!webkit) link.crossOrigin = ''
+        document.head.append(link)
+      }
+    </script>
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

@@ -50,14 +50,12 @@ export function mountLogs(root: HTMLElement) {
     list.append(li)
     while (list.children.length > KEPT) list.firstElementChild!.remove()
     if (!live) return
-    // The new line pushes the others up a line: they glide there, as a log view scrolls.
+    // The new line pushes the others up a line: the list glides there, as a log view scrolls.
     li.className = 'new'
-    const lines = [...list.querySelectorAll<HTMLElement>('li')]
-    const before = lines.map((l) => {
-      const r = l.getBoundingClientRect()
-      return new DOMRect(r.left, r.top + li.offsetHeight)
+    list.animate([{ transform: `translateY(${li.offsetHeight}px)` }, { transform: 'none' }], {
+      duration: 360,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
     })
-    glide(lines, before, 360)
     count(pod)
     if (level !== 'INFO') count(level === 'WARN' ? 'warn' : 'error')
   }

@@ -425,16 +425,6 @@ pre {
   background: var(--neutral);
 }
 
-.pulse {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-  50% {
-    opacity: 0.4;
-  }
-}
-
 /* The app's `rise`: a short lift into place. */
 @keyframes rise {
   from {

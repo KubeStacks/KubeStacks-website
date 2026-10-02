@@ -1,18 +1,27 @@
 /** Shared by the feature demos: they animate only while on screen, and never with reduced motion. */
 export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-/** Runs `tick` every `interval` ms while `el` is on screen; the first tick comes after `first`. */
+/**
+ * Runs `tick` every `interval` ms while `el` is on screen and the tab is showing; the first
+ * tick comes `first` ms after it shows.
+ */
 export function whileVisible(el: Element, interval: number, tick: () => void, first = interval) {
   if (reducedMotion) return
   let timer = 0
+  let onScreen = false
   const loop = () => {
     tick()
     timer = window.setTimeout(loop, interval)
   }
-  new IntersectionObserver(([entry]) => {
+  const update = () => {
     window.clearTimeout(timer)
-    if (entry!.isIntersecting) timer = window.setTimeout(loop, first)
+    if (onScreen && !document.hidden) timer = window.setTimeout(loop, first)
+  }
+  new IntersectionObserver(([entry]) => {
+    onScreen = entry!.isIntersecting
+    update()
   }).observe(el)
+  document.addEventListener('visibilitychange', update)
 }
 
 /** Moves elements from where they were (`before`) to where they are now, smoothly. */

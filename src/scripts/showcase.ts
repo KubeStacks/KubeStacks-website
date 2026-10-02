@@ -6,16 +6,27 @@ const ARMED_FOR = 1200
 
 export function mountShowcase(root: HTMLElement) {
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
+  let seen = false
 
-  // Every view loads up front (the window sits right under the hero), so switching never
+  // Once the window is on screen (or a view is picked), every view loads, so switching never
   // shows a blank frame: the current theme's screenshots, and the open view's in the other.
+  // Visitors who never get this far don't download them.
   function preload() {
+    if (!seen) return
     const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
     const other = theme === 'light' ? 'dark' : 'light'
     const images = root.querySelectorAll<HTMLImageElement>(
       `.view img[data-variant="${theme}"], .view[data-active="true"] img[data-variant="${other}"]`,
     )
-    for (const img of images) img.loading = 'eager'
+    for (const img of images) {
+      img.loading = 'eager'
+      // The other views' sources wait in data attributes (see Showcase.astro).
+      if (img.dataset.src) {
+        img.srcset = img.dataset.srcset!
+        img.src = img.dataset.src
+        delete img.dataset.src
+      }
+    }
   }
 
   function select(tab: HTMLButtonElement) {
@@ -28,6 +39,7 @@ export function mountShowcase(root: HTMLElement) {
       v.dataset.active = String(v.dataset.view === id)
     for (const c of root.querySelectorAll<HTMLElement>('[data-caption]'))
       c.hidden = c.dataset.caption !== id
+    seen = true
     preload()
   }
 
@@ -42,7 +54,13 @@ export function mountShowcase(root: HTMLElement) {
     })
   })
 
-  preload()
+  const observer = new IntersectionObserver(([entry]) => {
+    if (!entry!.isIntersecting) return
+    seen = true
+    preload()
+    observer.disconnect()
+  })
+  observer.observe(root.querySelector('.window')!)
   window.addEventListener('themechange', preload)
 
   // G, then a letter, as in the app: whatever key follows G ends the sequence. Not while
