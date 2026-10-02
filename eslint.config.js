@@ -6,7 +6,15 @@ import { defineConfig } from 'eslint/config'
 
 export default defineConfig(
   {
-    ignores: ['dist/', '.astro/'],
+    ignores: [
+      'dist/',
+      'dist-*/',
+      '.astro/',
+      'coverage/',
+      '.nyc_output/',
+      'test-results/',
+      'playwright-report/',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -27,7 +35,11 @@ export default defineConfig(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['*.config.{js,ts,mjs}', 'src/lib/latest-release.ts'],
+    files: ['scripts/**', 'tests/**', '*.config.{js,ts,mjs}', 'src/lib/latest-release.ts'],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['scripts/**', 'tests/**'],
+    rules: { 'no-console': 'off' },
   },
 )

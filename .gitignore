@@ -1,6 +1,11 @@
 node_modules/
 dist/
+dist-offline/
 .astro/
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
 *.log
 .DS_Store
 .env

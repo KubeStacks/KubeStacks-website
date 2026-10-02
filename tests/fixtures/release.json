@@ -1,0 +1,99 @@
+{
+  "tag_name": "v1.1.0",
+  "html_url": "https://github.com/KubeStacks/KubeStacks/releases/tag/v1.1.0",
+  "published_at": "2026-10-01T18:36:58Z",
+  "draft": false,
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "KubeStacks-1.1.0-linux-amd64.deb",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-linux-amd64.deb",
+      "size": 103011940
+    },
+    {
+      "name": "KubeStacks-1.1.0-linux-arm64.AppImage",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-linux-arm64.AppImage",
+      "size": 133587983
+    },
+    {
+      "name": "KubeStacks-1.1.0-linux-arm64.deb",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-linux-arm64.deb",
+      "size": 98177624
+    },
+    {
+      "name": "KubeStacks-1.1.0-linux-x86_64.AppImage",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-linux-x86_64.AppImage",
+      "size": 132345244
+    },
+    {
+      "name": "KubeStacks-1.1.0-linux-x86_64.rpm",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-linux-x86_64.rpm",
+      "size": 91625789
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-arm64.dmg",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-arm64.dmg",
+      "size": 135383705
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-arm64.zip",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-arm64.zip",
+      "size": 134019947
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-arm64.zip.blockmap",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-arm64.zip.blockmap",
+      "size": 140214
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-x64.dmg",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-x64.dmg",
+      "size": 142293851
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-x64.zip",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-x64.zip",
+      "size": 140979991
+    },
+    {
+      "name": "KubeStacks-1.1.0-mac-x64.zip.blockmap",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-mac-x64.zip.blockmap",
+      "size": 148920
+    },
+    {
+      "name": "KubeStacks-1.1.0-win.exe",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-win.exe",
+      "size": 223205197
+    },
+    {
+      "name": "KubeStacks-1.1.0-win.exe.blockmap",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/KubeStacks-1.1.0-win.exe.blockmap",
+      "size": 230190
+    },
+    {
+      "name": "latest-linux-arm64.yml",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/latest-linux-arm64.yml",
+      "size": 722
+    },
+    {
+      "name": "latest-linux.yml",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/latest-linux.yml",
+      "size": 724
+    },
+    {
+      "name": "latest-mac.yml",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/latest-mac.yml",
+      "size": 514
+    },
+    {
+      "name": "latest.yml",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/latest.yml",
+      "size": 345
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "browser_download_url": "https://github.com/KubeStacks/KubeStacks/releases/download/v1.1.0/SHA256SUMS.txt",
+      "size": 1083
+    }
+  ]
+}

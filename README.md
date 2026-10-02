@@ -6,6 +6,7 @@
 
 The website for [KubeStacks](https://github.com/KubeStacks/KubeStacks), a Kubernetes app for the desktop.
 
+[![E2E coverage](https://img.shields.io/badge/e2e%20coverage-100%25-3fb950)](#testing)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 </div>
@@ -28,11 +29,40 @@ npm run build      # the static site, in dist/
 npm run preview    # serves dist/
 ```
 
-| Command             | What it does                             |
-| ------------------- | ---------------------------------------- |
-| `npm run typecheck` | Type-checks the `.astro` and `.ts` files |
-| `npm run lint`      | ESLint                                   |
-| `npm run format`    | Prettier (`format:check` only checks)    |
+| Command                  | What it does                                                  |
+| ------------------------ | ------------------------------------------------------------- |
+| `npm run typecheck`      | Type-checks the `.astro` and `.ts` files                      |
+| `npm run lint`           | ESLint                                                        |
+| `npm run format`         | Prettier (`format:check` only checks)                         |
+| `npm run test:e2e`       | Builds the site with coverage, then runs the Playwright tests |
+| `npm run coverage`       | The tests, then the coverage report (`coverage/index.html`)   |
+| `npm run coverage:check` | Fails on anything uncovered, listing each line                |
+| `npm run verify`         | All of the above                                              |
+
+## Testing
+
+The end-to-end tests in [`tests/e2e`](tests/e2e) drive the built site in desktop Chromium and
+in WebKit as an iPhone, the way visitors use it. They cover every script on the page, at
+**100% of statements, branches, functions and lines**.
+
+- **Real builds.** `npm run build:coverage` builds the site twice: as published, and as built
+  while GitHub was down (so the browser has to find the release). Both talk to a stand-in for
+  GitHub's API ([`tests/support/github-stub.ts`](tests/support/github-stub.ts)) that answers
+  with [`tests/fixtures/release.json`](tests/fixtures/release.json), never the real API.
+- **Repeatable.** `Math.random` is seeded and the tests move time themselves with Playwright's
+  clock, so the cluster's life, the logs and the palette's typing play out the same on every
+  run.
+- **Coverage.** [`scripts/coverage.ts`](scripts/coverage.ts) instruments `src/` during the
+  build. The build's own code (release data, icons) reports from the build; the page's from
+  each test. [`scripts/check-coverage.ts`](scripts/check-coverage.ts) merges them and fails
+  on any gap, including a file nothing loaded.
+
+Visitors' computers are pretended with init scripts (`navigator.platform`, Chromium's
+`userAgentData`, the WebGL renderer that gives away an Intel Mac), and GitHub's answers with
+routes: a newer release, a release missing files, an outage.
+
+When a line is hard to reach, first ask whether it's needed: a fallback for something that
+can't happen can usually go.
 
 ## How it works
 
@@ -62,7 +92,8 @@ palettes in [`src/scripts/cluster/palette.ts`](src/scripts/cluster/palette.ts).
 
 Nothing on the page moves the page. The live demos have fixed heights and opt out of scroll
 anchoring (`overflow-anchor: none`), and rows that re-sort glide into place rather than jump.
-The demos only run while on screen, and not at all with reduced motion.
+The demos only run while on screen, and not at all with reduced motion. `tests/e2e/layout.spec.ts`
+checks for sideways scrolling at eight widths, layout shifts and scroll drift.
 
 ## Where things are
 
@@ -90,6 +121,10 @@ src/
     site.ts                 Links to the repository, author and Sevalla
   styles/global.css       The app's tokens, type scale and shared pieces
   assets/screenshots/     The app's screenshots, dark and light
+tests/
+  e2e/                    Playwright specs, by section
+  support/, fixtures/     The GitHub stand-in, a release, the cluster's geometry
+scripts/                  The coverage build and gate
 ```
 
 The design follows the app: its tokens, Inter and JetBrains Mono, Lucide icons, the status

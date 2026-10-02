@@ -1,4 +1,9 @@
 dist/
+dist-offline/
 .astro/
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
 node_modules/
 package-lock.json
