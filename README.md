@@ -9,6 +9,7 @@ The website for [KubeStacks](https://github.com/KubeStacks/KubeStacks), a Kubern
 [![CI](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KubeStacks/KubeStacks-website/actions/workflows/ci.yml)
 [![E2E coverage](https://img.shields.io/badge/e2e%20coverage-100%25-3fb950)](#testing)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![Hosted on Sevalla](https://img.shields.io/badge/hosted%20on-Sevalla-FF6900)](https://sevalla.com/?utm_source=kubestacks&utm_medium=referral&utm_campaign=website&utm_content=readme)
 
 </div>
 
@@ -137,10 +138,30 @@ and copy the `overview`, `workloads`, `bulk`, `metrics`, `logs`, `shell` and `he
 
 ## Deploying
 
-`npm run build` writes a plain static site to `dist/`, and any static host works. The site
-is hosted on [Sevalla](https://sevalla.com) as a static site, with `npm run build` as the
-build command and `dist` as the publish directory. `site` in
+The site is hosted on [Sevalla](https://sevalla.com/?utm_source=kubestacks&utm_medium=referral&utm_campaign=website&utm_content=readme) as a static site: Sevalla runs
+`npm run build` and serves `dist/`. Deploys come from CI. Once the checks and every test have
+passed on `main`, the last job asks Sevalla to deploy that commit with
+[sevalla-deploy](https://github.com/sevalla-hosting/sevalla-deploy), and waits until it's live.
+It needs two settings in the repository:
+
+- `SEVALLA_TOKEN`, a secret: a Sevalla API key, from
+  [app.sevalla.com/api-keys](https://app.sevalla.com/api-keys)
+- `SEVALLA_STATIC_SITE_ID`, a variable: the static site's ID in Sevalla (until it's set, CI
+  doesn't deploy)
+
+`npm run build` writes a plain static site, so any static host works too. `site` in
 [`astro.config.ts`](astro.config.ts) builds the canonical and social-preview links.
+
+## Hosted on Sevalla
+
+KubeStacks exists because of [Sevalla](https://sevalla.com/?utm_source=kubestacks&utm_medium=referral&utm_campaign=website&utm_content=readme): it's where its author works, keeping
+an eye on a lot of Kubernetes clusters. Sevalla runs apps, databases and static sites on
+Kubernetes, and the whole point is that you never have to think about Kubernetes. Push your
+code and Sevalla builds it, runs it and scales it, with databases, object storage and static
+sites next to it. You pay for the resources you use, and you never write a manifest.
+
+This site is one of those static sites. If you'd rather ship than run clusters,
+[give Sevalla a try](https://sevalla.com/?utm_source=kubestacks&utm_medium=referral&utm_campaign=website&utm_content=readme).
 
 ## Contributing
 

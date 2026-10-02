@@ -77,3 +77,22 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  deploy:
+    name: Deploy to Sevalla
+    # main, in this repository (not forks), once the checks and every test have passed, and
+    # once Sevalla is set up (see Deploying in the README).
+    if: >-
+      github.repository == 'KubeStacks/KubeStacks-website' && github.ref == 'refs/heads/main' &&
+      vars.SEVALLA_STATIC_SITE_ID != ''
+    needs: [checks, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sevalla-hosting/sevalla-deploy@9ac54237e055eb9113a93ae84a6722a8a89b774a # v2.0.0
+        with:
+          action: deploy-static-site
+          sevalla-token: ${{ secrets.SEVALLA_TOKEN }}
+          static-site-id: ${{ vars.SEVALLA_STATIC_SITE_ID }}
+          branch: main
+          # Fail the run if the deploy does.
+          wait-for-finish: true
