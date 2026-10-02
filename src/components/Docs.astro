@@ -1,0 +1,279 @@
+---
+import { PAGES, doc, type DocPath } from '../lib/docs'
+import { icon, type IconName } from '../lib/icons'
+
+// The docs' own groups, in their order, with the pages most people want from each.
+const groups: { name: string; icon: IconName; text: string; pages: DocPath[] }[] = [
+  {
+    name: 'Get started',
+    icon: 'play',
+    text: 'Install it, open your first cluster, and take the tour.',
+    pages: [
+      'get-started/desktop',
+      'get-started/in-your-cluster',
+      'get-started/tour',
+      'get-started/sign-in',
+    ],
+  },
+  {
+    name: 'Explore',
+    icon: 'layout-grid',
+    text: 'Find your way around a cluster, and what each status means.',
+    pages: ['explore/overview', 'explore/workloads', 'explore/health', 'explore/finding-things'],
+  },
+  {
+    name: 'Make changes',
+    icon: 'shield-check',
+    text: 'Every change KubeStacks makes, and the guard rails around it.',
+    pages: ['changes/safely', 'changes/yaml', 'changes/bulk', 'changes/undo-and-activity'],
+  },
+  {
+    name: 'Debug',
+    icon: 'square-terminal',
+    text: 'Logs as they’re written, shells, and port forwards.',
+    pages: ['debug/logs', 'debug/shell', 'debug/port-forwarding'],
+  },
+  {
+    name: 'Metrics',
+    icon: 'chart-line',
+    text: 'Usage right now, and its history from your Prometheus.',
+    pages: ['metrics/live-usage', 'metrics/usage-history'],
+  },
+  {
+    name: 'Helm',
+    icon: 'ship-wheel',
+    text: 'Read, upgrade, roll back and install releases.',
+    pages: ['helm/releases', 'helm/upgrade-and-rollback', 'helm/install'],
+  },
+  {
+    name: 'Custom resources',
+    icon: 'boxes',
+    text: 'Every other kind, and views that make sense of them.',
+    pages: [
+      'custom-resources/overview',
+      'custom-resources/built-in-views',
+      'custom-resources/write-a-view',
+    ],
+  },
+  {
+    name: 'In your cluster',
+    icon: 'server',
+    text: 'Install the chart, give it an address, and sign people in.',
+    pages: ['server/install', 'server/expose', 'server/auth/single-sign-on', 'server/helm-values'],
+  },
+  {
+    name: 'Reference',
+    icon: 'library',
+    text: 'Shortcuts, troubleshooting, answers, and what’s new.',
+    pages: [
+      'reference/keyboard-shortcuts',
+      'reference/troubleshooting',
+      'reference/faq',
+      'changelog',
+    ],
+  },
+]
+---
+
+<section class="docs" id="docs">
+  <div class="wrap">
+    <div class="head">
+      <div class="intro">
+        <span class="eyebrow">Docs</span>
+        <h2 class="h2">
+          Every screen, explained. <span class="dim">Every setting, too.</span>
+        </h2>
+      </div>
+      <div class="side">
+        <p class="lead">
+          Guides for the desktop app and for KubeStacks in your cluster, from your first cluster to
+          single sign-on, and a reference for every shortcut and setting.
+        </p>
+        <a class="btn btn-secondary" href={doc()} target="_blank" rel="noopener">
+          <Fragment set:html={icon('book-open')} />
+          Open the docs
+          <Fragment set:html={icon('arrow-up-right')} />
+        </a>
+      </div>
+    </div>
+
+    <ul class="groups">
+      {groups.map((g) => (
+        <li class="group">
+          <div class="g-head">
+            <span class="g-ic" set:html={icon(g.icon)} />
+            <h3>{g.name}</h3>
+          </div>
+          <p class="g-text">{g.text}</p>
+          <ul class="pages">
+            {g.pages.map((path) => (
+              <li>
+                <a href={doc(path)} target="_blank" rel="noopener">
+                  <span>{PAGES[path]}</span>
+                  <Fragment set:html={icon('arrow-up-right')} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .docs {
+    padding-block: clamp(64px, 9vw, 120px) clamp(48px, 7vw, 96px);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: 2rem 4rem;
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+
+  .intro {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .side {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .side .lead {
+    font-size: 1.0625rem;
+  }
+
+  /* An index of the docs: one panel, its groups divided by hairlines (the gaps show the
+     panel's line color through). */
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    padding: 1px;
+    list-style: none;
+    border-radius: 18px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px 24px 18px;
+    background: var(--surface);
+  }
+
+  .g-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .g-ic {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+
+  .g-ic :global(svg) {
+    width: 15px;
+    height: 15px;
+  }
+
+  .g-head h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .g-text {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+
+  .pages {
+    display: grid;
+    margin: 0 -10px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pages a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-2);
+    text-decoration: none;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .pages a :global(svg) {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition:
+      opacity 150ms ease,
+      transform 160ms ease;
+  }
+
+  .pages a:hover {
+    background: var(--tint-strong);
+    color: var(--text-1);
+  }
+
+  .pages a:hover :global(svg),
+  .pages a:focus-visible :global(svg) {
+    opacity: 0.8;
+    transform: translate(1px, -1px);
+  }
+
+  /* Without a pointer to hover with, the arrows show from the start. */
+  @media (hover: none) {
+    .pages a :global(svg) {
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* No empty cell after an odd last group. */
+    .group:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .group:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+  }
+</style>

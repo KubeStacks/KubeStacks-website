@@ -1,6 +1,8 @@
 ---
+import DocLink from './DocLink.astro'
 import KubeStacksLogo from './logos/KubeStacksLogo.astro'
 import GithubMark from './logos/GithubMark.astro'
+import { doc } from '../lib/docs'
 import { icon } from '../lib/icons'
 import { escapeHtml } from '../lib/html'
 import { server, site } from '../lib/site'
@@ -66,6 +68,9 @@ const docker = `docker run --rm -p 8080:8080 \\
         <a href={fileUrl(dl, 'sums')} data-dl="sums" target="_blank" rel="noopener">
           SHA-256 checksums
         </a>
+        <DocLink path="get-started/desktop" section="verify-your-download">
+          Verify your download
+        </DocLink>
       </p>
       <p class="status" data-dl-fallback hidden={!!dl}>
         Every installer is on
@@ -78,7 +83,9 @@ const docker = `docker run --rm -p 8080:8080 \\
 
     <div class="track">
       <h3>On your computer</h3>
-      <span class="t-note">macOS, Windows and Linux</span>
+      <span class="t-note">
+        <DocLink path="get-started/desktop" />
+      </span>
     </div>
 
     <ul class="platforms">
@@ -196,8 +203,10 @@ const docker = `docker run --rm -p 8080:8080 \\
     <div class="extra">
       <div class="build">
         <div class="b-label">
-          <span>Or build it yourself</span>
-          <span class="b-needs">Node.js 24 or later</span>
+          <span>
+            Or build it yourself <span class="b-needs">with Node.js 24 or later</span>
+          </span>
+          <DocLink path="reference/build-from-source">Build from source</DocLink>
         </div>
         <div class="b-cmd">
           <code id="build-cmd">{build}</code>
@@ -230,7 +239,9 @@ const docker = `docker run --rm -p 8080:8080 \\
 
     <div class="track" id="install-cluster">
       <h3>In your cluster</h3>
-      <span class="t-note">For the whole team, in a browser</span>
+      <span class="t-note">
+        <DocLink path="server/overview" />
+      </span>
     </div>
 
     <ul class="servers">
@@ -243,6 +254,7 @@ const docker = `docker run --rm -p 8080:8080 \\
           Any cluster on Kubernetes 1.25 or later. Then open localhost:8080 and sign in with a
           token.
         </p>
+        <DocLink path="server/install" />
         <div class="cmd">
           <pre id="helm-cmd" set:html={lines(helm)} />
           <button
@@ -256,9 +268,17 @@ const docker = `docker run --rm -p 8080:8080 \\
           </button>
         </div>
         <p class="p-more">
-          An ingress, single sign-on and every other setting are in{' '}
-          <a href={site.serverDocs} target="_blank" rel="noopener">
-            the docs
+          Then give it{' '}
+          <a href={doc('server/expose')} target="_blank" rel="noopener">
+            an address of its own
+          </a>
+          , sign people in with{' '}
+          <a href={doc('server/auth/single-sign-on')} target="_blank" rel="noopener">
+            single sign-on
+          </a>
+          , or see{' '}
+          <a href={doc('server/helm-values')} target="_blank" rel="noopener">
+            every setting
           </a>
           .
         </p>
@@ -272,6 +292,7 @@ const docker = `docker run --rm -p 8080:8080 \\
         <p class="p-info">
           Without Kubernetes, on a machine of its own: KubeStacks shows a cluster from a kubeconfig.
         </p>
+        <DocLink path="server/docker" />
         <div class="cmd">
           <pre id="docker-cmd" set:html={lines(docker)} />
           <button
@@ -285,7 +306,12 @@ const docker = `docker run --rm -p 8080:8080 \\
           </button>
         </div>
         <p class="p-more">
-          For linux/amd64 and arm64. Each release is signed with a build provenance attestation.
+          For linux/amd64 and arm64. Each release is signed with a build provenance attestation,
+          which you can{' '}
+          <a href={doc('server/install', 'verify-the-image')} target="_blank" rel="noopener">
+            verify
+          </a>
+          .
         </p>
       </li>
     </ul>
@@ -294,6 +320,10 @@ const docker = `docker run --rm -p 8080:8080 \\
       <a class="btn btn-primary" href={site.repo} target="_blank" rel="noopener">
         <GithubMark size={17} />
         Star on GitHub
+      </a>
+      <a class="btn btn-secondary" href={doc()} target="_blank" rel="noopener">
+        <Fragment set:html={icon('book-open')} />
+        Read the docs
       </a>
       <a class="btn btn-secondary" href={site.releases} target="_blank" rel="noopener">
         All releases
@@ -572,13 +602,19 @@ const docker = `docker run --rm -p 8080:8080 \\
   .servers > li {
     display: grid;
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    justify-items: start;
     gap: 10px 32px;
+  }
+
+  .servers .p-head {
+    justify-self: stretch;
   }
 
   .servers .cmd {
     grid-column: 2;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
+    justify-self: stretch;
     align-self: center;
     margin-top: 0;
   }
@@ -639,8 +675,10 @@ const docker = `docker run --rm -p 8080:8080 \\
 
   .b-label {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 12px;
+    align-items: baseline;
+    gap: 4px 12px;
     margin-bottom: 12px;
     font-size: 0.875rem;
     font-weight: 500;

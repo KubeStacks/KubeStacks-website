@@ -93,6 +93,14 @@ without a redeploy. Each is picked by its name there (see
 [`src/lib/screenshots.ts`](src/lib/screenshots.ts)), and names never change. The tests answer
 every screenshot with one small stand-in, `tests/fixtures/screenshot.webp`.
 
+### Docs
+
+The docs live at [docs.kubestacks.com](https://docs.kubestacks.com), from their own repository
+([KubeStacks/KubeStacks-docs](https://github.com/KubeStacks/KubeStacks-docs)). Every link into
+them names its page by path in [`src/lib/docs.ts`](src/lib/docs.ts), which lists each page the
+site links to with its title there: the compiler catches a page that isn't listed, and links
+read like the pages they open. When the docs rename or move a page, change it there.
+
 ### Light and dark
 
 The page follows the system's theme, or the one picked in the switch at the top (System,
@@ -139,8 +147,10 @@ src/
     Cluster.astro           KubeStacks served from a cluster, and how people sign in
     More.astro              Custom resources and views, and the smaller features
     Themes.astro            Light and dark, side by side
+    Docs.astro              An index of the docs, by their groups
     Story.astro             Why KubeStacks exists, and Sevalla
     Download.astro          Platforms, building from source, requirements; the chart and image
+    DocLink.astro           A link to a page of the docs, the same everywhere
     logos/                  KubeStacks, GitHub and Sevalla marks
   scripts/                Each section's behavior, mounted on its data-* attribute
     cluster/                The hero: data, geometry, palettes and the renderer
@@ -149,6 +159,7 @@ src/
     theme.ts                The theme switch
   lib/                    Shared by the build and the page
     releases.ts             The latest release and which file each platform gets
+    docs.ts                 The docs' pages the site links to, with their titles there
     icons.ts                Lucide icons (the app's set) as SVG strings, and the status pill
     screenshots.ts          The app's screenshots, from its repository
     site.ts                 Links to the repository, author and Sevalla; the chart and image

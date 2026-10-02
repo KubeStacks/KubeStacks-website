@@ -1,4 +1,5 @@
 import { test, expect, prepare, save, ONLINE } from './fixtures'
+import { DOCS_URL, PAGES } from '../../src/lib/docs'
 import { SCREENSHOTS } from '../../src/lib/screenshots'
 import type { Page } from '@playwright/test'
 
@@ -188,6 +189,40 @@ test.describe('in your cluster', () => {
       `${SCREENSHOTS}server-account-dark-1x.webp`,
       `${SCREENSHOTS}server-account-light-1x.webp`,
     ])
+  })
+})
+
+test.describe('the docs', () => {
+  test('are in the navigation on any screen, as an icon on a phone', async ({ page, isMobile }) => {
+    await page.goto('/')
+    const docs = page.locator('[data-nav] a[aria-label="Docs"]')
+    await expect(docs).toBeVisible()
+    await expect(docs).toHaveAttribute('href', DOCS_URL)
+    await expect(docs.locator('span')).toBeVisible({ visible: !isMobile })
+    await expect(page.locator(`footer a[href="${DOCS_URL}"]`)).toHaveText('Docs')
+  })
+
+  test('every link into them opens one of their pages, in a tab of its own', async ({ page }) => {
+    await page.goto('/')
+    const links = await page
+      .locator(`a[href^="${DOCS_URL}"]`)
+      .evaluateAll((as) => as.map((a) => [a.getAttribute('href')!, a.getAttribute('target')]))
+    expect(links.length).toBeGreaterThan(40)
+    for (const [href, target] of links) {
+      const path = new URL(href!).pathname.slice(1)
+      if (path) expect(Object.keys(PAGES), href!).toContain(path)
+      expect(target, href!).toBe('_blank')
+    }
+  })
+
+  test('the index lists each group’s pages by their titles there', async ({ page }) => {
+    await page.goto('/')
+    const groups = page.locator('#docs .group')
+    await expect(groups).toHaveCount(9)
+    for (const a of await page.locator('#docs .pages a').all()) {
+      const path = new URL((await a.getAttribute('href'))!).pathname.slice(1)
+      await expect(a).toHaveText(PAGES[path as keyof typeof PAGES])
+    }
   })
 })
 

@@ -1,4 +1,6 @@
 ---
+import DocLink from './DocLink.astro'
+import { doc, type DocPath } from '../lib/docs'
 import { icon, type IconName } from '../lib/icons'
 import { highlightYaml } from '../lib/yaml'
 
@@ -36,50 +38,67 @@ spec:
   links:
     - { name: Secret, kind: Secret, objectName: '{{ .spec.secretName }}' }`
 
-const more: { icon: IconName; title: string; text: string }[] = [
+// Each with its page in the docs, and the heading there when the page is about more.
+const more: {
+  icon: IconName
+  title: string
+  docs: DocPath
+  section?: string
+  text: string
+}[] = [
   {
     icon: 'square-terminal',
     title: 'Shells and debug containers',
+    docs: 'debug/shell',
     text: 'Open a shell in any container, or add a debug container with tools to a pod that has none, distroless included.',
   },
   {
     icon: 'plug',
     title: 'Port forwards',
+    docs: 'debug/port-forwarding',
     text: 'From the desktop app, forward to pods and services on localhost. They stay in the header until you stop them or quit.',
   },
   {
     icon: 'list-checks',
     title: 'Many at once',
+    docs: 'changes/bulk',
     text: 'Select rows with Shift-click or X, then restart, cordon, suspend or delete them together, with a retry for any that fail.',
   },
   {
     icon: 'shield-check',
     title: 'Hard to do by accident',
+    docs: 'changes/safely',
     text: 'Destructive dialogs start on Cancel. Anything in a cluster named like production asks you to type the name first.',
   },
   {
     icon: 'lock',
     title: 'Read-only when you want it',
+    docs: 'changes/read-only',
     text: 'Turn changes off for one cluster, or for everyone with KUBESTACKS_READ_ONLY=1 (readOnly in the chart). KubeStacks enforces it, not just the buttons.',
   },
   {
     icon: 'key-round',
     title: 'Works with your kubeconfig',
+    docs: 'clusters/connect',
     text: 'Multiple files, client certificates, tokens and exec plugins like gke-gcloud-auth-plugin, aws eks get-token and kubelogin.',
   },
   {
     icon: 'gauge',
     title: 'Built for big clusters',
+    docs: 'explore/pods',
+    section: 'thousands-of-pods',
     text: 'Lists load in chunks of 500 and are paginated and virtualized, so thousands of pods stay smooth.',
   },
   {
     icon: 'wifi-off',
     title: 'Calm when things go wrong',
+    docs: 'reference/troubleshooting',
     text: 'A lost connection shows a banner and keeps the last data on screen instead of a blank window.',
   },
   {
     icon: 'check',
     title: 'Tested end to end',
+    docs: 'reference/build-from-source',
     text: '100% of every line and branch, measured across the desktop app and the server on macOS, Windows and Linux. The chart is installed on a real cluster too.',
   },
 ]
@@ -102,8 +121,16 @@ const more: { icon: IconName; title: string; text: string }[] = [
           {projects.map((p) => (
             <li>{p}</li>
           ))}
-          <li class="yours">Your own</li>
+          <li class="yours">
+            <a href={doc('custom-resources/write-a-view')} target="_blank" rel="noopener">
+              Your own
+            </a>
+          </li>
         </ul>
+        <div class="v-links">
+          <DocLink path="custom-resources/overview" />
+          <DocLink path="custom-resources/built-in-views" />
+        </div>
       </div>
 
       <figure class="yaml" aria-label="A view, written in YAML">
@@ -113,7 +140,7 @@ const more: { icon: IconName; title: string; text: string }[] = [
         <pre><code set:html={highlightYaml(yaml)} /></pre>
         <p class="yaml-note">
           Views are data only. They read fields with JSONPath and change objects only with the
-          patches they spell out.
+          patches they spell out. <DocLink path="reference/view-format" />
         </p>
       </figure>
     </div>
@@ -122,7 +149,12 @@ const more: { icon: IconName; title: string; text: string }[] = [
       {more.map((m) => (
         <li>
           <span class="ic" set:html={icon(m.icon)} />
-          <h3>{m.title}</h3>
+          <h3>
+            <a href={doc(m.docs, m.section)} target="_blank" rel="noopener">
+              {m.title}
+              <Fragment set:html={icon('arrow-up-right')} />
+            </a>
+          </h3>
           <p>{m.text}</p>
         </li>
       ))}
@@ -172,6 +204,25 @@ const more: { icon: IconName; title: string; text: string }[] = [
     box-shadow: inset 0 0 0 1px var(--line);
     font-size: 0.8125rem;
     color: var(--text-2);
+  }
+
+  .projects .yours a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .projects .yours:hover {
+    background: var(--accent-soft);
+  }
+
+  .v-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+  }
+
+  .yaml-note :global(.doc-link) {
+    margin-left: 4px;
   }
 
   .projects .yours {
@@ -249,6 +300,7 @@ const more: { icon: IconName; title: string; text: string }[] = [
   .list li {
     display: grid;
     grid-template-columns: 20px minmax(0, 1fr);
+    align-content: start;
     gap: 6px 14px;
     padding: 28px 28px 28px 0;
     border-bottom: 1px solid var(--line);
@@ -274,6 +326,33 @@ const more: { icon: IconName; title: string; text: string }[] = [
     font-size: 0.9375rem;
     font-weight: 600;
     letter-spacing: -0.01em;
+  }
+
+  /* Each title opens its page in the docs. */
+  .list h3 a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .list h3 a :global(svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--text-3);
+    transition:
+      color 150ms ease,
+      transform 160ms ease;
+  }
+
+  .list h3 a:hover {
+    color: var(--accent-strong);
+  }
+
+  .list h3 a:hover :global(svg) {
+    color: currentColor;
+    transform: translate(1px, -1px);
   }
 
   .list p {

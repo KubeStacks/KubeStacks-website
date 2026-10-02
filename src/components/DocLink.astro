@@ -1,0 +1,64 @@
+---
+/**
+ * A link to a page of the docs, named by the page's title unless given another label. One
+ * look everywhere, so a reader learns it once: a book, the title, and an arrow out.
+ */
+import { icon } from '../lib/icons'
+import { PAGES, doc, type DocPath } from '../lib/docs'
+
+interface Props {
+  path: DocPath
+  section?: string
+}
+
+const { path, section } = Astro.props
+const label = Astro.slots.has('default') ? await Astro.slots.render('default') : PAGES[path]
+---
+
+<a class="doc-link" href={doc(path, section)} target="_blank" rel="noopener">
+  <Fragment set:html={icon('book-open')} />
+  <span set:html={label} />
+  <Fragment set:html={icon('arrow-up-right')} />
+</a>
+
+<style>
+  .doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--accent-strong);
+    text-decoration: none;
+  }
+
+  .doc-link span {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .doc-link:hover span {
+    text-decoration-color: currentColor;
+  }
+
+  .doc-link :global(svg) {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .doc-link :global(svg:last-child) {
+    opacity: 0.6;
+    transition:
+      transform 160ms ease,
+      opacity 160ms ease;
+  }
+
+  .doc-link:hover :global(svg:last-child) {
+    opacity: 1;
+    transform: translate(1px, -1px);
+  }
+</style>

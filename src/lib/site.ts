@@ -2,8 +2,6 @@
 export const site = {
   repo: 'https://github.com/KubeStacks/KubeStacks',
   releases: 'https://github.com/KubeStacks/KubeStacks/releases',
-  /** Running KubeStacks in a cluster: signing in, ingress, security and every setting. */
-  serverDocs: 'https://github.com/KubeStacks/KubeStacks/blob/main/docs/server.md',
   author: { name: 'Peter Kota', url: 'https://github.com/kotapeter' },
   sevalla: 'https://sevalla.com/?utm_source=kubestacks&utm_medium=referral&utm_campaign=website',
 }

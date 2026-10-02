@@ -5,6 +5,7 @@
  */
 import ArrowRight from 'lucide-static/icons/arrow-right.svg?raw'
 import ArrowUpRight from 'lucide-static/icons/arrow-up-right.svg?raw'
+import BookOpen from 'lucide-static/icons/book-open.svg?raw'
 import Box from 'lucide-static/icons/box.svg?raw'
 import Boxes from 'lucide-static/icons/boxes.svg?raw'
 import ChartLine from 'lucide-static/icons/chart-line.svg?raw'
@@ -20,6 +21,7 @@ import Gauge from 'lucide-static/icons/gauge.svg?raw'
 import KeyRound from 'lucide-static/icons/key-round.svg?raw'
 import Layers from 'lucide-static/icons/layers.svg?raw'
 import LayoutGrid from 'lucide-static/icons/layout-grid.svg?raw'
+import Library from 'lucide-static/icons/library.svg?raw'
 import Link from 'lucide-static/icons/link.svg?raw'
 import ListChecks from 'lucide-static/icons/list-checks.svg?raw'
 import Lock from 'lucide-static/icons/lock.svg?raw'
@@ -27,11 +29,13 @@ import LogIn from 'lucide-static/icons/log-in.svg?raw'
 import Minus from 'lucide-static/icons/minus.svg?raw'
 import Monitor from 'lucide-static/icons/monitor.svg?raw'
 import Moon from 'lucide-static/icons/moon.svg?raw'
+import Play from 'lucide-static/icons/play.svg?raw'
 import Plug from 'lucide-static/icons/plug.svg?raw'
 import Plus from 'lucide-static/icons/plus.svg?raw'
 import RotateCw from 'lucide-static/icons/rotate-cw.svg?raw'
 import ScrollText from 'lucide-static/icons/scroll-text.svg?raw'
 import Search from 'lucide-static/icons/search.svg?raw'
+import Server from 'lucide-static/icons/server.svg?raw'
 import ShieldCheck from 'lucide-static/icons/shield-check.svg?raw'
 import ShipWheel from 'lucide-static/icons/ship-wheel.svg?raw'
 import SquareTerminal from 'lucide-static/icons/square-terminal.svg?raw'
@@ -43,6 +47,7 @@ import WifiOff from 'lucide-static/icons/wifi-off.svg?raw'
 const ICONS = {
   'arrow-right': ArrowRight,
   'arrow-up-right': ArrowUpRight,
+  'book-open': BookOpen,
   box: Box,
   boxes: Boxes,
   'chart-line': ChartLine,
@@ -58,6 +63,7 @@ const ICONS = {
   'key-round': KeyRound,
   layers: Layers,
   'layout-grid': LayoutGrid,
+  library: Library,
   link: Link,
   'list-checks': ListChecks,
   lock: Lock,
@@ -65,11 +71,13 @@ const ICONS = {
   minus: Minus,
   monitor: Monitor,
   moon: Moon,
+  play: Play,
   plug: Plug,
   plus: Plus,
   'rotate-cw': RotateCw,
   'scroll-text': ScrollText,
   search: Search,
+  server: Server,
   'shield-check': ShieldCheck,
   'ship-wheel': ShipWheel,
   'square-terminal': SquareTerminal,
