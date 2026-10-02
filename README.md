@@ -31,6 +31,7 @@ npm run preview    # serves dist/
 | Command             | What it does                             |
 | ------------------- | ---------------------------------------- |
 | `npm run typecheck` | Type-checks the `.astro` and `.ts` files |
+| `npm run lint`      | ESLint                                   |
 | `npm run format`    | Prettier (`format:check` only checks)    |
 
 ## How it works
